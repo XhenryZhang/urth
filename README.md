@@ -2,5 +2,8 @@
 Urth
 
 **Members**
-Xinyi Zhang
+
+Xinyi Zhang 
+
+Kyle Wong 
 
