@@ -1,0 +1,2 @@
+rootProject.name='Urth'
+include ':app'
