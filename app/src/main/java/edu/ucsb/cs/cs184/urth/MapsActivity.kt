@@ -146,7 +146,9 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     val responseArray = JSONArray(response)
                     for (i in 0 until responseArray.length()){
                         if (responseArray.getJSONArray(i).length() >= 1) {
-                            citySet.add(responseArray.getJSONArray(i).getString(1))
+                            if (responseArray.getJSONArray(i).getString(1) != null) {
+                                citySet.add(responseArray.getJSONArray(i).getString(1))
+                            }
                         }
                     }
                     locationSet = (citySet + countySet + stateSet + countrySet) as HashSet<String>
