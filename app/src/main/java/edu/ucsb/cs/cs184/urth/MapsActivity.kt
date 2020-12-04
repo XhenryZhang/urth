@@ -121,10 +121,18 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d("WHAT", "State: $state")
                     Log.d("WHAT", "country: $country")
 
-                    citySet.add(city)
-                    countySet.add(county)
-                    stateSet.add(state)
-                    countrySet.add(country)
+                    if (city != null) {
+                        citySet.add(city)
+                    }
+                    if (county != null) {
+                        countySet.add(county)
+                    }
+                    if (state != null) {
+                        stateSet.add(state)
+                    }
+                    if (country != null) {
+                        countrySet.add(country)
+                    }
                 }
             } catch (e: IOException){
                 e.printStackTrace()
