@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.location.Location
 import android.location.LocationManager
 import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
@@ -73,10 +74,16 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
         }
 
-        val location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
+        var startLatLng: LatLng
         // center map on current location
-        val startLatLng = LatLng(location.latitude, location.longitude)
+        startLatLng = if (location != null){
+            LatLng(location.latitude, location.longitude)
+        } else {
+            LatLng(-34.0, 151.0)
+        }
+
         mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
 
         // initialize variables
