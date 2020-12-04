@@ -4,18 +4,13 @@ import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
-import android.location.Location
 import android.location.LocationManager
-import android.nfc.Tag
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.getSystemService
 import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 
@@ -29,7 +24,6 @@ import com.google.android.gms.maps.model.MarkerOptions
 import org.json.JSONArray
 import java.io.IOException
 import java.util.*
-import kotlin.collections.ArrayList
 import kotlin.collections.HashSet
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -41,7 +35,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_maps)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-                .findFragmentById(R.id.map) as SupportMapFragment
+            .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -68,8 +62,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(this,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
+            )
         } else {
             Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show()
         }
@@ -78,7 +74,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         var startLatLng: LatLng
         // center map on current location
-        startLatLng = if (location != null){
+        startLatLng = if (location != null) {
             LatLng(location.latitude, location.longitude)
         } else {
             LatLng(-34.0, 151.0)
@@ -110,7 +106,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 val geocoder = Geocoder(this, Locale.getDefault())
                 val locations = geocoder.getFromLocation(it.latitude, it.longitude, 1)
 
-                if (locations != null && locations.size > 0){
+                if (locations != null && locations.size > 0) {
                     val city = locations[0].locality
                     val county = locations[0].subAdminArea
                     val state = locations[0].adminArea
@@ -134,7 +130,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                         countrySet.add(country)
                     }
                 }
-            } catch (e: IOException){
+            } catch (e: IOException) {
                 e.printStackTrace()
             }
 
@@ -152,7 +148,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                     Log.d(TAG, response)
 
                     val responseArray = JSONArray(response)
-                    for (i in 0 until responseArray.length()){
+                    for (i in 0 until responseArray.length()) {
                         if (responseArray.getJSONArray(i).length() >= 1) {
                             if (responseArray.getJSONArray(i).getString(1) != null) {
                                 citySet.add(responseArray.getJSONArray(i).getString(1))
