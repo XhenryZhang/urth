@@ -18,7 +18,8 @@ class AuthActivity : AppCompatActivity() {
 
         val providers = arrayListOf(
             AuthUI.IdpConfig.EmailBuilder().build(),
-            AuthUI.IdpConfig.GoogleBuilder().build()
+            AuthUI.IdpConfig.GoogleBuilder().build(),
+            AuthUI.IdpConfig.FacebookBuilder().build()
         )
 
         startActivityForResult(
