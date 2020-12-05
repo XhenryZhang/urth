@@ -2,17 +2,21 @@ package edu.ucsb.cs.cs184.urth
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.firebase.ui.auth.AuthUI
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -28,11 +32,16 @@ import kotlin.collections.HashSet
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
+    companion object {
+        private val TAG = MapsActivity::class.simpleName
+    }
+
     private lateinit var mMap: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        openOptionsMenu()
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -89,7 +98,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         var stateSet: HashSet<String>
         var countrySet: HashSet<String>
         var locationSet: HashSet<String>
-        val TAG = "requestTag"
 
         // handle map clicks
         mMap.setOnMapClickListener {
@@ -177,5 +185,30 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                // TODO: This will open the settings activity
+                Log.d(TAG, "Settings menu not yet implemented!")
+                return true
+            }
+            R.id.action_logout -> {
+                AuthUI.getInstance().delete(this)
+                    .addOnSuccessListener { Log.d(TAG, "Logged out successfully.") }
+                    .addOnFailureListener { Log.d(TAG, "Error logging out: ${it.message}") }
+                val intent = Intent(this, AuthActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 }

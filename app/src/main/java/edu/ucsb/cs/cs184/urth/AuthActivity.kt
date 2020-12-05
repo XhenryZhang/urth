@@ -38,7 +38,7 @@ class AuthActivity : AppCompatActivity() {
 
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
-                Log.i(TAG, "Authentication success!")
+                Log.d(TAG, "Authentication success!")
                 val intent = Intent(this, MapsActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
                 startActivity(intent)
