@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "664660463186",
+    "project_id": "urth-297621",
+    "storage_bucket": "urth-297621.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664660463186:android:30d8c93cd723e3ad2b998b",
+        "android_client_info": {
+          "package_name": "edu.ucsb.cs.cs184.urth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664660463186-cfvqqmeoqkptuate4ec8lkmvdfjmsah9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.ucsb.cs.cs184.urth",
+            "certificate_hash": "55da4604bd5fbe01498bc2875581ab294788106d"
+          }
+        },
+        {
+          "client_id": "664660463186-9ao1oarj2p3rvvs2ooa44f94s7f13g7r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqTjAYIJYb9ljNVs3bu9k1xNF5SLjkdhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664660463186-9ao1oarj2p3rvvs2ooa44f94s7f13g7r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
