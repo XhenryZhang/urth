@@ -1,0 +1,37 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/articles_header">
+
+        <ListPreference
+            app:defaultValue="popularity"
+            app:entries="@array/default_sort_entries"
+            app:entryValues="@array/default_sort_values"
+            app:key="default_sort"
+            app:title="@string/default_sort_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="past_day"
+            app:entries="@array/recency_filter_entries"
+            app:entryValues="@array/recency_filter_values"
+            app:key="recency_filter"
+            app:title="@string/recency_filter_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="20"
+            app:entries="@array/search_radius_entries"
+            app:entryValues="@array/search_radius_values"
+            app:key="search_radius"
+            app:title="@string/search_radius_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="expand_search"
+            app:summaryOff="@string/expand_search_summary_off"
+            app:summaryOn="@string/expand_search_summary_on"
+            app:title="@string/expand_search_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
