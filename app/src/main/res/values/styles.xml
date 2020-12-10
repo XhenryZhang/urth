@@ -8,4 +8,10 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AuthTheme" parent="FirebaseUI">
+<!--        Keeping the action bar visible for now until we finalize the layout.-->
+<!--        <item name="windowActionBar">false</item>-->
+<!--        <item name="windowNoTitle">true</item>-->
+    </style>
+
 </resources>
