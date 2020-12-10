@@ -28,7 +28,7 @@ class MapsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                // TODO: This will open the set tings activity
+                // TODO: This will open the settings activity
                 Log.d(TAG, "Settings menu not yet implemented!")
                 return true
             }
@@ -44,5 +44,4 @@ class MapsActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
