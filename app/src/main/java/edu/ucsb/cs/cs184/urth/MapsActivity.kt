@@ -18,6 +18,7 @@ class MapsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         openOptionsMenu()
+        // TODO: get user preferences from Firebase database
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
