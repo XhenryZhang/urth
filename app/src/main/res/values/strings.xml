@@ -31,4 +31,7 @@
     <string name="expand_search_title">Auto-expand search radius</string>
     <string name="expand_search_summary_off">Only search for articles within the specified radius</string>
     <string name="expand_search_summary_on">Expand search radius if no nearby articles are found</string>
+    <string name="search_article_body_title">Search article body</string>
+    <string name="search_article_body_summary_off">Search for locations in article titles only</string>
+    <string name="search_article_body_summary_on">Search for locations in article bodies</string>
 </resources>

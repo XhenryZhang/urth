@@ -18,7 +18,10 @@ class MapsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         openOptionsMenu()
-        // TODO: get user preferences from Firebase database
+        if (intent.getBooleanExtra(AuthActivity.FETCH_PERMISSIONS, false)) {
+            Log.d(TAG, "Fetching user preferences from database...")
+            // TODO: get user preferences from Firebase database
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -35,12 +38,18 @@ class MapsActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_logout -> {
-                AuthUI.getInstance().delete(this)
-                    .addOnSuccessListener { Log.d(TAG, "Logged out successfully.") }
-                    .addOnFailureListener { Log.d(TAG, "Error logging out: ${it.message}") }
                 val intent = Intent(this, AuthActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
+                AuthUI.getInstance().delete(this)
+                    .addOnSuccessListener {
+                        startActivity(intent)
+                        Log.d(TAG, "Logged out successfully.")
+                    }
+                    .addOnFailureListener {
+                        intent.putExtra(AuthActivity.LOGOUT_ERROR, true)
+                        startActivity(intent)
+                        Log.d(TAG, "Error logging out: ${it.message}")
+                    }
                 return true
             }
             else -> super.onOptionsItemSelected(item)
