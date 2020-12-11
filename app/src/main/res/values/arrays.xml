@@ -1,0 +1,49 @@
+<resources>
+    <!-- Default Sort Preferences -->
+    <string-array name="default_sort_entries">
+        <item>By date published</item>
+        <item>By location relevancy</item>
+        <item>By popularity</item>
+    </string-array>
+    <string-array name="default_sort_values">
+        <item>date</item>
+        <item>relevancy</item>
+        <item>popularity</item>
+    </string-array>
+
+    <!-- Recency Filter Preferences -->
+    <string-array name="recency_filter_entries">
+        <item>Past day</item>
+        <item>Past week</item>
+        <item>Past month</item>
+    </string-array>
+    <string-array name="recency_filter_values">
+        <item>past_day</item>
+        <item>past_week</item>
+        <item>past_month</item>
+    </string-array>
+
+    <!-- Max Articles Preferences -->
+    <string-array name="max_articles_entries">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+    <string-array name="max_articles_values">
+        <item>5</item>
+        <item>10</item>
+        <item>20</item>
+    </string-array>
+
+    <!-- Search Radius Preferences -->
+    <string-array name="search_radius_entries">
+        <item>20 km</item>
+        <item>40 km</item>
+        <item>60 km</item>
+    </string-array>
+    <string-array name="search_radius_values">
+        <item>20</item>
+        <item>40</item>
+        <item>60</item>
+    </string-array>
+</resources>

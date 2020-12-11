@@ -18,6 +18,7 @@ class MapsActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         openOptionsMenu()
+        // TODO: get user preferences from Firebase database
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -28,8 +29,9 @@ class MapsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_settings -> {
-                // TODO: This will open the set tings activity
-                Log.d(TAG, "Settings menu not yet implemented!")
+                val intent = Intent(this, SettingsActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
                 return true
             }
             R.id.action_logout -> {
@@ -44,5 +46,4 @@ class MapsActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
 }
