@@ -78,48 +78,48 @@ class SearchFragment : Fragment() {
             googleMap = mMap
 
             // request and wait for location permissions to be granted
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
-                )
+//            if (ActivityCompat.checkSelfPermission(
+//                    requireContext(),
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                    requireContext(),
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//                ActivityCompat.requestPermissions(
+//                    requireActivity(),
+//                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
+//                )
+//
+//                // pause app until permissions are added
+//                while (true) {
+//                    if (!(ActivityCompat.checkSelfPermission(
+//                            requireContext(),
+//                            Manifest.permission.ACCESS_FINE_LOCATION
+//                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                            requireContext(),
+//                            Manifest.permission.ACCESS_COARSE_LOCATION
+//                        ) != PackageManager.PERMISSION_GRANTED
+//                                )
+//                    ) {
+//                        break
+//                    }
+//                }
+//            }
 
-                // pause app until permissions are added
-                while (true) {
-                    if (!(ActivityCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.ACCESS_FINE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                            requireContext(),
-                            Manifest.permission.ACCESS_COARSE_LOCATION
-                        ) != PackageManager.PERMISSION_GRANTED
-                                )
-                    ) {
-                        break
-                    }
-                }
-            }
-
-            googleMap.isMyLocationEnabled = true
+//            googleMap.isMyLocationEnabled = true
 
             val locationManager =
                 requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            var startLatLng: LatLng
+//            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+            val startLatLng: LatLng = LatLng(-34.0, 151.0)
 
             // center map on current location
-            startLatLng = if (location != null) {
-                LatLng(location.latitude, location.longitude)
-            } else {
-                LatLng(-34.0, 151.0)
-            }
+//            startLatLng = if (location != null) {
+//                LatLng(location.latitude, location.longitude)
+//            } else {
+//                LatLng(-34.0, 151.0)
+//            }
 
             mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
 
