@@ -3,10 +3,10 @@
     <PreferenceCategory app:title="@string/articles_header">
 
         <ListPreference
-            app:defaultValue="popularity"
+            app:defaultValue="by_popularity"
             app:entries="@array/default_sort_entries"
             app:entryValues="@array/default_sort_values"
-            app:key="default_sort"
+            app:key="defaultSort"
             app:title="@string/default_sort_title"
             app:useSimpleSummaryProvider="true" />
 
@@ -14,23 +14,37 @@
             app:defaultValue="past_day"
             app:entries="@array/recency_filter_entries"
             app:entryValues="@array/recency_filter_values"
-            app:key="recency_filter"
+            app:key="recencyFilter"
             app:title="@string/recency_filter_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="20"
+            app:defaultValue="ten"
+            app:entries="@array/max_articles_entries"
+            app:entryValues="@array/max_articles_values"
+            app:key="maxArticles"
+            app:title="@string/max_articles_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <ListPreference
+            app:defaultValue="twenty"
             app:entries="@array/search_radius_entries"
             app:entryValues="@array/search_radius_values"
-            app:key="search_radius"
+            app:key="searchRadius"
             app:title="@string/search_radius_title"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
-            app:key="expand_search"
+            app:key="expandSearch"
             app:summaryOff="@string/expand_search_summary_off"
             app:summaryOn="@string/expand_search_summary_on"
             app:title="@string/expand_search_title" />
+
+        <SwitchPreferenceCompat
+            app:key="searchArticleBody"
+            app:summaryOff="@string/search_article_body_summary_off"
+            app:summaryOn="@string/search_article_body_summary_on"
+            app:title="@string/search_article_body_title" />
 
     </PreferenceCategory>
 

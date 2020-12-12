@@ -1,19 +1,25 @@
 package edu.ucsb.cs.cs184.urth
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import edu.ucsb.cs.cs184.urth.FirebaseUtil.setFirebasePrefs
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.memberProperties
 
 class SettingsActivity : AppCompatActivity() {
 
     companion object {
         private val TAG = SettingsActivity::class.simpleName
-        private val STRING_KEYS = listOf("default_sort", "recency_filter", "search_radius")
-        private val BOOLEAN_KEYS = listOf("expand_search")
     }
+
+    private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
+    private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
+    private var settingsChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,35 +31,32 @@ class SettingsActivity : AppCompatActivity() {
                 .commit()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        PreferenceManager.getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener { sharedPreferences, s ->
-                // TODO: save new preference value to Firebase
-                when (s) {
-                    in STRING_KEYS -> {
-                        Log.d(TAG, "Updated $s to ${sharedPreferences.getString(s, "")}")
-                        Toast.makeText(
-                            this,
-                            "Updated $s to ${sharedPreferences.getString(s, "")}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    in BOOLEAN_KEYS -> {
-                        Log.d(TAG, "Updated $s to ${sharedPreferences.getBoolean(s, false)}")
-                        Toast.makeText(
-                            this,
-                            "Updated $s to ${sharedPreferences.getBoolean(s, false)}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    else -> Log.w(TAG, "Invalid preference key: $s")
-                }
-            }
+        listenForPreferenceChanges()
     }
 
-    // This can be moved into its own file later if we start adding a bunch of code to it
-    class SettingsFragment : PreferenceFragmentCompat() {
-        override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            setPreferencesFromResource(R.xml.root_preferences, rootKey)
+    override fun onDestroy() {
+        super.onDestroy()
+        if (settingsChanged) {
+            val uid = FirebaseAuth.getInstance().uid
+            val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+            setFirebasePrefs(ref, userPrefs)
+        }
+    }
+
+    private fun listenForPreferenceChanges() {
+        sp.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
+            val prop = UserPreferences::class.memberProperties.find { it.name == key }
+            if (prop != null && prop is KMutableProperty<*>) {
+                val newValue = sharedPreferences.getValue(key)
+                if (newValue != null) {
+                    settingsChanged = true
+                    prop.setter.call(userPrefs, newValue)
+                    Log.d(TAG, "Updated $key preference to $newValue")
+                    Log.d(TAG, "New user preferences: $userPrefs")
+                }
+            } else {
+                Log.w(TAG, "Invalid preference key: $key")
+            }
         }
     }
 }
