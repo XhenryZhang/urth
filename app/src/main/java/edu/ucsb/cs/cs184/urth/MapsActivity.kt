@@ -1,12 +1,17 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.content.Intent
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.preference.PreferenceManager
 import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 
 class MapsActivity : AppCompatActivity() {
 
@@ -14,16 +19,26 @@ class MapsActivity : AppCompatActivity() {
         private val TAG = MapsActivity::class.simpleName
     }
 
+    private lateinit var sp: SharedPreferences
+    private lateinit var auth: FirebaseAuth
+    private lateinit var ref: DatabaseReference
+    private lateinit var userPrefs: UserPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         openOptionsMenu()
+
+        sp = PreferenceManager.getDefaultSharedPreferences(this)
+        auth = FirebaseAuth.getInstance()
+        ref = FirebaseDatabase.getInstance().getReference("/users/${auth.uid}")
         if (intent.getBooleanExtra(AuthActivity.FETCH_PERMISSIONS, false)) {
-            Log.d(TAG, "Fetching user preferences from database...")
-            // TODO: if fetch permissions flag is set, get user preferences from Firebase database and update pref manager permissions
+            Log.d(TAG, "Fetching user preferences for user ${auth.uid} from database...")
+            // TODO: try to get user preferences from Firebase database and update pref manager permissions
             // TODO: if DB preferences not found, get from pref manager and upload
         } else {
-            // TODO: else, just get preferences from pref manager
+            // Otherwise, retrieve user preferences from the local preference manager
+            userPrefs = sp.fetchLocalPreferences()
         }
     }
 

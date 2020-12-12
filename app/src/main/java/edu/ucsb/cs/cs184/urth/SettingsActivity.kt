@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import java.util.Locale
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 
@@ -16,7 +15,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
-    private val userPrefs: UserPreferences by lazy { fetchLocalPreferences() }
+    private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,14 +30,6 @@ class SettingsActivity : AppCompatActivity() {
         listenForPreferenceChanges()
     }
 
-    private fun fetchLocalPreferences(): UserPreferences {
-        val prefs = UserPreferences()
-        UserPreferences::class.memberProperties
-            .filterIsInstance<KMutableProperty<*>>()
-            .forEach { prop -> prop.setter.call(prefs, sp.getValue(prop.name)) }
-        return prefs
-    }
-
     private fun listenForPreferenceChanges() {
         sp.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
             // TODO: save new preference value to Firebase
@@ -51,20 +42,5 @@ class SettingsActivity : AppCompatActivity() {
                 Log.w(TAG, "Invalid preference key: $key")
             }
         }
-    }
-
-    private fun SharedPreferences.getValue(key: String): Any {
-        val prefKey = Preference.values().find { it.key == key } ?: return Unit
-        return when (prefKey) {
-            Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key))
-            Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key))
-            Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key))
-            Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key))
-            Preference.ExpandSearch, Preference.SearchArticleBody -> getBoolean(key, false)
-        }
-    }
-
-    private fun SharedPreferences.getEnumName(key: String): String {
-        return getString(key, null)!!.toUpperCase(Locale.getDefault())
     }
 }
