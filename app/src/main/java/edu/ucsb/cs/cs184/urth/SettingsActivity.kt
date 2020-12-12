@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import java.util.*
+import java.util.Locale
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 
