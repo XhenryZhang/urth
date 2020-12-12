@@ -13,16 +13,17 @@ class AuthActivity : AppCompatActivity() {
     companion object {
         private val TAG = AuthActivity::class.simpleName
         private const val RC_SIGN_IN = 32
-        const val LOGOUT_ERROR = "LOGOUT_ERROR"
-        const val FETCH_PERMISSIONS = "FETCH_PERMISSIONS"
+        const val EXTRA_LOGOUT_ERROR = "LOGOUT_ERROR"
+        const val EXTRA_FETCH_PERMISSIONS = "FETCH_PERMISSIONS"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (FirebaseAuth.getInstance().uid != null && !intent.getBooleanExtra(LOGOUT_ERROR, false)) {
-            // Skip authentication if we're already signed in
-            startMapActivity()
+        if (FirebaseAuth.getInstance().uid != null &&
+            !intent.getBooleanExtra(EXTRA_LOGOUT_ERROR, false)
+        ) {
+            startMapActivity() // Skip authentication if we're already signed in
         } else {
             val providers = arrayListOf(
                 AuthUI.IdpConfig.EmailBuilder().build(),
@@ -62,7 +63,7 @@ class AuthActivity : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK or
                 Intent.FLAG_ACTIVITY_NEW_TASK or
                 Intent.FLAG_ACTIVITY_NO_ANIMATION
-        intent.putExtra(FETCH_PERMISSIONS, true)
+        intent.putExtra(EXTRA_FETCH_PERMISSIONS, true)
         startActivity(intent)
     }
 }

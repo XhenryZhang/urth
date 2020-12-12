@@ -5,6 +5,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import edu.ucsb.cs.cs184.urth.FirebaseUtil.setFirebasePrefs
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 
@@ -16,6 +19,7 @@ class SettingsActivity : AppCompatActivity() {
 
     private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(this) }
     private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
+    private var settingsChanged = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,11 +34,20 @@ class SettingsActivity : AppCompatActivity() {
         listenForPreferenceChanges()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if (settingsChanged) {
+            val uid = FirebaseAuth.getInstance().uid
+            val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+            setFirebasePrefs(ref, userPrefs)
+        }
+    }
+
     private fun listenForPreferenceChanges() {
         sp.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
-            // TODO: save new preference value to Firebase
             val prop = UserPreferences::class.memberProperties.find { it.name == key }
             if (prop != null && prop is KMutableProperty<*>) {
+                settingsChanged = true
                 prop.setter.call(userPrefs, sharedPreferences.getValue(key))
                 Log.d(TAG, "Updated $key preference to ${sharedPreferences.getValue(key)}")
                 Log.d(TAG, "New user preferences: $userPrefs")

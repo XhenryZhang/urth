@@ -10,8 +10,8 @@ import android.view.MenuItem
 import androidx.preference.PreferenceManager
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.*
+import edu.ucsb.cs.cs184.urth.FirebaseUtil.setFirebasePrefs
 
 class MapsActivity : AppCompatActivity() {
 
@@ -20,7 +20,7 @@ class MapsActivity : AppCompatActivity() {
     }
 
     private lateinit var sp: SharedPreferences
-    private lateinit var auth: FirebaseAuth
+    private lateinit var uid: String
     private lateinit var ref: DatabaseReference
     private lateinit var userPrefs: UserPreferences
 
@@ -30,14 +30,14 @@ class MapsActivity : AppCompatActivity() {
         openOptionsMenu()
 
         sp = PreferenceManager.getDefaultSharedPreferences(this)
-        auth = FirebaseAuth.getInstance()
-        ref = FirebaseDatabase.getInstance().getReference("/users/${auth.uid}")
-        if (intent.getBooleanExtra(AuthActivity.FETCH_PERMISSIONS, false)) {
-            Log.d(TAG, "Fetching user preferences for user ${auth.uid} from database...")
-            // TODO: try to get user preferences from Firebase database and update pref manager permissions
-            // TODO: if DB preferences not found, get from pref manager and upload
+        uid = FirebaseAuth.getInstance().uid!!
+        ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        if (intent.getBooleanExtra(AuthActivity.EXTRA_FETCH_PERMISSIONS, false)) {
+            // Try to retrieve user preferences from Firebase
+            Log.d(TAG, "Fetching user preferences for user $uid from database...")
+            getFirebasePrefs(ref)
         } else {
-            // Otherwise, retrieve user preferences from the local preference manager
+            // Retrieve user preferences from the local preference manager
             userPrefs = sp.fetchLocalPreferences()
         }
     }
@@ -64,7 +64,7 @@ class MapsActivity : AppCompatActivity() {
                         Log.d(TAG, "Logged out successfully.")
                     }
                     .addOnFailureListener {
-                        intent.putExtra(AuthActivity.LOGOUT_ERROR, true)
+                        intent.putExtra(AuthActivity.EXTRA_LOGOUT_ERROR, true)
                         startActivity(intent)
                         Log.d(TAG, "Error logging out: ${it.message}")
                     }
@@ -72,5 +72,24 @@ class MapsActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun getFirebasePrefs(ref: DatabaseReference) {
+        ref.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val dbPrefs = snapshot.getValue(UserPreferences::class.java)
+                if (dbPrefs == null) {
+                    // Firebase preferences not found
+                    userPrefs = sp.fetchLocalPreferences()
+                    setFirebasePrefs(ref, userPrefs)
+                } else {
+                    // Update local preferences
+                    userPrefs = dbPrefs
+                    // TODO: change values using pref manager
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {}
+        })
     }
 }
