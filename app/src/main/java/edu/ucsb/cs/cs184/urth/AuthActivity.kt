@@ -20,7 +20,7 @@ class AuthActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (FirebaseAuth.getInstance().uid != null && intent.getBooleanExtra(LOGOUT_ERROR, false)) {
+        if (FirebaseAuth.getInstance().uid != null && !intent.getBooleanExtra(LOGOUT_ERROR, false)) {
             // Skip authentication if we're already signed in
             startMapActivity()
         } else {

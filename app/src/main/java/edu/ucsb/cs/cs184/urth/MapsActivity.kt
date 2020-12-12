@@ -20,7 +20,10 @@ class MapsActivity : AppCompatActivity() {
         openOptionsMenu()
         if (intent.getBooleanExtra(AuthActivity.FETCH_PERMISSIONS, false)) {
             Log.d(TAG, "Fetching user preferences from database...")
-            // TODO: get user preferences from Firebase database
+            // TODO: if fetch permissions flag is set, get user preferences from Firebase database and update pref manager permissions
+            // TODO: if DB preferences not found, get from pref manager and upload
+        } else {
+            // TODO: else, just get preferences from pref manager
         }
     }
 

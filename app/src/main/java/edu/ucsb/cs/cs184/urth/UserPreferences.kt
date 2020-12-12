@@ -16,6 +16,27 @@ data class UserPreferences(
         false,
         false
     )
+
+    // For debugging
+    override fun toString(): String {
+        return "{ " +
+                "defaultSort: $defaultSort, " +
+                "recencyFilter: $recencyFilter, " +
+                "maxArticles: $maxArticles, " +
+                "searchRadius: $searchRadius, " +
+                "expandSearch: $expandSearch, " +
+                "searchArticleBody: $searchArticleBody" +
+                " }"
+    }
+}
+
+enum class Preference(val key: String) {
+    DefaultSort("defaultSort"),
+    RecencyFilter("recencyFilter"),
+    MaxArticles("maxArticles"),
+    SearchRadius("searchRadius"),
+    ExpandSearch("expandSearch"),
+    SearchArticleBody("searchArticleBody")
 }
 
 enum class DefaultSort {
