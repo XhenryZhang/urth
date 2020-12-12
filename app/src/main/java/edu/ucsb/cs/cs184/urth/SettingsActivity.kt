@@ -47,10 +47,13 @@ class SettingsActivity : AppCompatActivity() {
         sp.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->
             val prop = UserPreferences::class.memberProperties.find { it.name == key }
             if (prop != null && prop is KMutableProperty<*>) {
-                settingsChanged = true
-                prop.setter.call(userPrefs, sharedPreferences.getValue(key))
-                Log.d(TAG, "Updated $key preference to ${sharedPreferences.getValue(key)}")
-                Log.d(TAG, "New user preferences: $userPrefs")
+                val newValue = sharedPreferences.getValue(key)
+                if (newValue != null) {
+                    settingsChanged = true
+                    prop.setter.call(userPrefs, newValue)
+                    Log.d(TAG, "Updated $key preference to $newValue")
+                    Log.d(TAG, "New user preferences: $userPrefs")
+                }
             } else {
                 Log.w(TAG, "Invalid preference key: $key")
             }

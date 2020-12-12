@@ -12,6 +12,8 @@ import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
 import edu.ucsb.cs.cs184.urth.FirebaseUtil.setFirebasePrefs
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.memberProperties
 
 class MapsActivity : AppCompatActivity() {
 
@@ -80,12 +82,18 @@ class MapsActivity : AppCompatActivity() {
                 val dbPrefs = snapshot.getValue(UserPreferences::class.java)
                 if (dbPrefs == null) {
                     // Firebase preferences not found
+                    Log.d(TAG, "No existing preferences on database. Adding current preferences...")
                     userPrefs = sp.fetchLocalPreferences()
                     setFirebasePrefs(ref, userPrefs)
                 } else {
                     // Update local preferences
+                    Log.d(TAG, "Updating local preferences...")
                     userPrefs = dbPrefs
-                    // TODO: change values using pref manager
+                    sp.edit().apply {
+                        UserPreferences::class.memberProperties
+                            .filterIsInstance<KMutableProperty<*>>()
+                            .forEach { prop -> putValue(prop.name, prop.getter.call(userPrefs)) }
+                    }.apply()
                 }
             }
 

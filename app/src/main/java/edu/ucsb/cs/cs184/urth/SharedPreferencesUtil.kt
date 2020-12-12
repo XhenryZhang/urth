@@ -13,8 +13,8 @@ fun SharedPreferences.fetchLocalPreferences(): UserPreferences {
     return prefs
 }
 
-fun SharedPreferences.getValue(key: String): Any {
-    val prefKey = Preference.values().find { it.key == key } ?: return Unit
+fun SharedPreferences.getValue(key: String): Any? {
+    val prefKey = Preference.values().find { it.key == key } ?: return null
     return when (prefKey) {
         Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key))
         Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key))
@@ -26,4 +26,13 @@ fun SharedPreferences.getValue(key: String): Any {
 
 private fun SharedPreferences.getEnumName(key: String): String {
     return getString(key, null)!!.toUpperCase(Locale.getDefault())
+}
+
+fun SharedPreferences.Editor.putValue(key: String, value: Any?) {
+    if (value is Boolean) {
+        putBoolean(key, value)
+    } else {
+        val stringValue = value.toString().toLowerCase(Locale.getDefault())
+        putString(key, stringValue)
+    }
 }
