@@ -1,8 +1,6 @@
 package edu.ucsb.cs.cs184.urth
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
@@ -11,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -53,7 +50,7 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false)
+        return inflater.inflate(R.layout.fragment_search, container, false)
     }
 
     // location information
