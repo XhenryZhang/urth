@@ -1,7 +1,7 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.content.SharedPreferences
-import java.util.*
+import java.util.Locale
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 
@@ -16,10 +16,10 @@ fun SharedPreferences.fetchLocalPreferences(): UserPreferences {
 fun SharedPreferences.getValue(key: String): Any? {
     val prefKey = Preference.values().find { it.key == key } ?: return null
     return when (prefKey) {
-        Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key)?:"BY_DATE")
-        Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key)?:"PAST_DAY")
-        Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key)?:"FIVE")
-        Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key)?:"TWENTY")
+        Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key) ?: "BY_POPULARITY")
+        Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key) ?: "PAST_DAY")
+        Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key) ?: "TEN")
+        Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key) ?: "TWENTY")
         Preference.ExpandSearch, Preference.SearchArticleBody -> getBoolean(key, false)
     }
 }
