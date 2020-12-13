@@ -43,9 +43,9 @@ class SearchFragment : Fragment() {
     private lateinit var googleMap: GoogleMap
 
     // arguments passed to the API query
-    private lateinit var location: Array<String>
+    private lateinit var location: HashSet<String>
     private lateinit var date: String
-    private var searchType: Boolean = false
+    private lateinit var searchType: String
 
     // only gets called once the view is created
     override fun onCreateView(
@@ -60,6 +60,8 @@ class SearchFragment : Fragment() {
     // genre of news -- currently defaults to 2 days ago
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // this is our drawer fragment
+        val bottomDrawerFragment = BottomDrawerFragment()
 
         viewModel = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
 
@@ -131,7 +133,7 @@ class SearchFragment : Fragment() {
             var countrySet: HashSet<String>
             var locationSet: HashSet<String>
 
-            // handle map clicks
+            // handle map clicks -- saves location of cities and opens drawer
             mMap.setOnMapClickListener {
                 marker?.remove()
                 marker = mMap.addMarker(MarkerOptions().position(it))
@@ -190,12 +192,11 @@ class SearchFragment : Fragment() {
 
                         // define headers and make request
                         locationSet = (citySet + countySet) as HashSet<String>
-                        val date: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                        val queryType = "relevance"
-                        makeQuery(ArrayList<String>(locationSet), date, queryType)
+                        location = locationSet
+                        date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                        searchType = "relevance"
 
-                        // switch to NewsFragment
-                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                        bottomDrawerFragment.show(childFragmentManager, "TRANSITION_NEWS")
                     },
                     { error ->
                         Log.d("ERROR", error.toString())
@@ -301,6 +302,15 @@ class SearchFragment : Fragment() {
         }
 
         queue.add(stringRequest)
+    }
+
+    // bottom drawer fragment calls this
+    fun transitionToNewsArticles() {
+        makeQuery(ArrayList<String>(location), date, searchType)
+
+        // switch to NewsFragment
+        childFragmentManager.popBackStack()
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
     override fun onResume() {

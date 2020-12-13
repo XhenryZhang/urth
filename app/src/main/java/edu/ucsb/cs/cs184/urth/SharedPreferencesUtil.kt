@@ -16,16 +16,16 @@ fun SharedPreferences.fetchLocalPreferences(): UserPreferences {
 fun SharedPreferences.getValue(key: String): Any? {
     val prefKey = Preference.values().find { it.key == key } ?: return null
     return when (prefKey) {
-        Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key))
-        Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key))
-        Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key))
-        Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key))
+        Preference.DefaultSort -> DefaultSort.valueOf(getEnumName(key)?:"BY_DATE")
+        Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key)?:"PAST_DAY")
+        Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key)?:"FIVE")
+        Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key)?:"TWENTY")
         Preference.ExpandSearch, Preference.SearchArticleBody -> getBoolean(key, false)
     }
 }
 
-private fun SharedPreferences.getEnumName(key: String): String {
-    return getString(key, null)!!.toUpperCase(Locale.getDefault())
+private fun SharedPreferences.getEnumName(key: String): String? {
+    return getString(key, null)?.toUpperCase(Locale.getDefault())
 }
 
 fun SharedPreferences.Editor.putValue(key: String, value: Any?) {
