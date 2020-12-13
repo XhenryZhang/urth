@@ -39,18 +39,22 @@ enum class Preference(val key: String) {
     SearchArticleBody("searchArticleBody")
 }
 
-enum class DefaultSort {
-    BY_DATE, BY_RELEVANCY, BY_POPULARITY
+enum class DefaultSort(val sortMethod: String) {
+    BY_DATE("publishedAt"),
+    BY_RELEVANCY("relevance"),
+    BY_POPULARITY("popularity")
 }
 
-enum class RecencyFilter {
-    PAST_DAY, PAST_WEEK, PAST_MONTH
+enum class RecencyFilter(val duration: Int) {
+    PAST_DAY(1),
+    PAST_WEEK(7),
+    PAST_MONTH(1)
 }
 
 enum class MaxArticles {
     FIVE, TEN, TWENTY
 }
 
-enum class SearchRadius {
-    TWENTY, FORTY, SIXTY
+enum class SearchRadius(val km: Int) {
+    TWENTY(20), FORTY(40), SIXTY(60)
 }
