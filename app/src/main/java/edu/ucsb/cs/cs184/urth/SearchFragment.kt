@@ -35,7 +35,7 @@ import kotlin.collections.HashSet
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class SearchFragment : Fragment() {
+class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var viewModel: NewsViewModel
 
     // map objects
@@ -304,15 +304,6 @@ class SearchFragment : Fragment() {
         queue.add(stringRequest)
     }
 
-    // bottom drawer fragment calls this
-    fun transitionToNewsArticles() {
-        makeQuery(ArrayList<String>(location), date, searchType)
-
-        // switch to NewsFragment
-        childFragmentManager.popBackStack()
-        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-    }
-
     override fun onResume() {
         super.onResume()
         mMapView.onResume()
@@ -347,4 +338,12 @@ class SearchFragment : Fragment() {
             Toast.makeText(requireContext(), "PERMISSION_DENIED", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun performNewsQuery() {
+        makeQuery(ArrayList<String>(location), date, searchType)
+
+        // switch to NewsFragment
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
+
 }
