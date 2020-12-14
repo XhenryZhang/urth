@@ -36,11 +36,13 @@ import kotlin.collections.HashSet
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
-    private lateinit var viewModel: NewsViewModel
+    private lateinit var viewModelNews: NewsViewModel
+    private lateinit var viewModelSearch: SearchViewModel
 
     // map objects
     lateinit var mMapView: MapView
     private lateinit var googleMap: GoogleMap
+    private lateinit var startLatLng: LatLng
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -63,7 +65,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         // this is our drawer fragment
         val bottomDrawerFragment = BottomDrawerFragment()
 
-        viewModel = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
+        viewModelNews = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
+        viewModelSearch = ViewModelProvider(activity as ViewModelStoreOwner).get(SearchViewModel::class.java)
 
         // initialize map
         mMapView = view.findViewById(R.id.mapView) as MapView
@@ -74,6 +77,10 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         } catch (e: Exception){
             e.printStackTrace()
         }
+
+        viewModelSearch.mapLocation.observe(viewLifecycleOwner, {
+            startLatLng = it
+        })
 
         // implement map functionality
         mMapView.getMapAsync(OnMapReadyCallback { mMap ->
@@ -114,7 +121,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             val locationManager =
                 requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 //            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val startLatLng: LatLng = LatLng(-34.0, 151.0)
 
             // center map on current location
 //            startLatLng = if (location != null) {
@@ -208,6 +214,11 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         })
     }
 
+    override fun onStop() {
+        super.onStop()
+        viewModelSearch.setLocation(googleMap.cameraPosition.target)
+    }
+
     // creates a list of news objects and passes it to the NewsViewModel
     private fun createNewsObject(
         titleStore: ArrayList<String>,
@@ -227,8 +238,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             )
         }
 
-        viewModel.setNews(newsArray)
-        viewModel.changeTextVal("poggers")
+        viewModelNews.setNews(newsArray)
+        // viewModelNews.changeTextVal("poggers")
     }
 
     // makes the query with the news API
