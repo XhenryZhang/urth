@@ -390,7 +390,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                     queries += "\"${location}\""
                 }
             }
-            url = "http://newsapi.org/v2/everything?qInTitle=${queries}&from=${date}&sortBy=${queryType}&language=en&apiKey=84f2017538e54767a2557129ec44f823"
+            val q = if (userPrefs.searchArticleBody) "q" else "qInTitle"
+            url = "http://newsapi.org/v2/everything?$q=${queries}&from=${date}&sortBy=${queryType}&language=en&apiKey=84f2017538e54767a2557129ec44f823"
         }else  {
             url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }
