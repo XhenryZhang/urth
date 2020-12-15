@@ -33,6 +33,7 @@ class MapsActivity : AppCompatActivity() {
 
         sp = PreferenceManager.getDefaultSharedPreferences(this)
         uid = FirebaseAuth.getInstance().uid!!
+        Log.d("debugging", uid)
         ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
         if (intent.getBooleanExtra(AuthActivity.EXTRA_FETCH_PERMISSIONS, false)) {
             // Try to retrieve user preferences from Firebase

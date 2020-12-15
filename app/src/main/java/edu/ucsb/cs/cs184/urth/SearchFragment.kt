@@ -35,17 +35,19 @@ import kotlin.collections.HashSet
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class SearchFragment : Fragment() {
-    private lateinit var viewModel: NewsViewModel
+class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
+    private lateinit var viewModelNews: NewsViewModel
+    private lateinit var viewModelSearch: SearchViewModel
 
     // map objects
     lateinit var mMapView: MapView
     private lateinit var googleMap: GoogleMap
+    private lateinit var startLatLng: LatLng
 
     // arguments passed to the API query
-    private lateinit var location: Array<String>
+    private lateinit var location: HashSet<String>
     private lateinit var date: String
-    private var searchType: Boolean = false
+    private lateinit var searchType: String
 
     // only gets called once the view is created
     override fun onCreateView(
@@ -60,8 +62,11 @@ class SearchFragment : Fragment() {
     // genre of news -- currently defaults to 2 days ago
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // this is our drawer fragment
+        val bottomDrawerFragment = BottomDrawerFragment()
 
-        viewModel = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
+        viewModelNews = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
+        viewModelSearch = ViewModelProvider(activity as ViewModelStoreOwner).get(SearchViewModel::class.java)
 
         // initialize map
         mMapView = view.findViewById(R.id.mapView) as MapView
@@ -72,6 +77,10 @@ class SearchFragment : Fragment() {
         } catch (e: Exception){
             e.printStackTrace()
         }
+
+        viewModelSearch.mapLocation.observe(viewLifecycleOwner, {
+            startLatLng = it
+        })
 
         // implement map functionality
         mMapView.getMapAsync(OnMapReadyCallback { mMap ->
@@ -112,7 +121,6 @@ class SearchFragment : Fragment() {
             val locationManager =
                 requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
 //            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-            val startLatLng: LatLng = LatLng(-34.0, 151.0)
 
             // center map on current location
 //            startLatLng = if (location != null) {
@@ -131,7 +139,7 @@ class SearchFragment : Fragment() {
             var countrySet: HashSet<String>
             var locationSet: HashSet<String>
 
-            // handle map clicks
+            // handle map clicks -- saves location of cities and opens drawer
             mMap.setOnMapClickListener {
                 marker?.remove()
                 marker = mMap.addMarker(MarkerOptions().position(it))
@@ -190,12 +198,11 @@ class SearchFragment : Fragment() {
 
                         // define headers and make request
                         locationSet = (citySet + countySet) as HashSet<String>
-                        val date: String = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                        val queryType = "relevance"
-                        makeQuery(ArrayList<String>(locationSet), date, queryType)
+                        location = locationSet
+                        date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+                        searchType = "relevance"
 
-                        // switch to NewsFragment
-                        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+                        bottomDrawerFragment.show(childFragmentManager, "TRANSITION_NEWS")
                     },
                     { error ->
                         Log.d("ERROR", error.toString())
@@ -205,6 +212,11 @@ class SearchFragment : Fragment() {
                 queue.add(stringRequest)
             }
         })
+    }
+
+    override fun onStop() {
+        super.onStop()
+        viewModelSearch.setLocation(googleMap.cameraPosition.target)
     }
 
     // creates a list of news objects and passes it to the NewsViewModel
@@ -226,8 +238,8 @@ class SearchFragment : Fragment() {
             )
         }
 
-        viewModel.setNews(newsArray)
-        viewModel.changeTextVal("poggers")
+        viewModelNews.setNews(newsArray)
+        // viewModelNews.changeTextVal("poggers")
     }
 
     // makes the query with the news API
@@ -337,4 +349,12 @@ class SearchFragment : Fragment() {
             Toast.makeText(requireContext(), "PERMISSION_DENIED", Toast.LENGTH_SHORT).show()
         }
     }
+
+    override fun performNewsQuery() {
+        makeQuery(ArrayList<String>(location), date, searchType)
+
+        // switch to NewsFragment
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
+
 }
