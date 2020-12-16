@@ -5,15 +5,13 @@ data class UserPreferences(
     var recencyFilter: RecencyFilter,
     var maxArticles: MaxArticles,
     var searchRadius: SearchRadius,
-    var expandSearch: Boolean,
     var searchArticleBody: Boolean
 ) {
     constructor() : this(
         DefaultSort.BY_POPULARITY,
         RecencyFilter.PAST_DAY,
-        MaxArticles.TEN,
+        MaxArticles.TWENTY,
         SearchRadius.TWENTY,
-        false,
         false
     )
 
@@ -24,7 +22,6 @@ data class UserPreferences(
                 "recencyFilter: $recencyFilter, " +
                 "maxArticles: $maxArticles, " +
                 "searchRadius: $searchRadius, " +
-                "expandSearch: $expandSearch, " +
                 "searchArticleBody: $searchArticleBody" +
                 " }"
     }
@@ -35,7 +32,6 @@ enum class Preference(val key: String) {
     RecencyFilter("recencyFilter"),
     MaxArticles("maxArticles"),
     SearchRadius("searchRadius"),
-    ExpandSearch("expandSearch"),
     SearchArticleBody("searchArticleBody")
 }
 
@@ -51,10 +47,14 @@ enum class RecencyFilter(val duration: Int) {
     PAST_MONTH(1)
 }
 
-enum class MaxArticles {
-    FIVE, TEN, TWENTY
+enum class MaxArticles(val pageSize: Int) {
+    TEN(10),
+    TWENTY(20),
+    FIFTY(50)
 }
 
 enum class SearchRadius(val km: Int) {
-    TWENTY(20), FORTY(40), SIXTY(60)
+    TWENTY(20),
+    FORTY(40),
+    SIXTY(60)
 }

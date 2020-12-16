@@ -19,7 +19,7 @@
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="ten"
+            app:defaultValue="twenty"
             app:entries="@array/max_articles_entries"
             app:entryValues="@array/max_articles_values"
             app:key="maxArticles"
@@ -33,12 +33,6 @@
             app:key="searchRadius"
             app:title="@string/search_radius_title"
             app:useSimpleSummaryProvider="true" />
-
-        <SwitchPreferenceCompat
-            app:key="expandSearch"
-            app:summaryOff="@string/expand_search_summary_off"
-            app:summaryOn="@string/expand_search_summary_on"
-            app:title="@string/expand_search_title" />
 
         <SwitchPreferenceCompat
             app:key="searchArticleBody"

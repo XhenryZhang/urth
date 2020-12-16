@@ -20,7 +20,7 @@ fun SharedPreferences.getValue(key: String): Any? {
         Preference.RecencyFilter -> RecencyFilter.valueOf(getEnumName(key) ?: return null)
         Preference.MaxArticles -> MaxArticles.valueOf(getEnumName(key) ?: return null)
         Preference.SearchRadius -> SearchRadius.valueOf(getEnumName(key) ?: return null)
-        Preference.ExpandSearch, Preference.SearchArticleBody -> getBoolean(key, false)
+        Preference.SearchArticleBody -> getBoolean(key, false)
     }
 }
 

@@ -25,14 +25,14 @@
 
     <!-- Max Articles Preferences -->
     <string-array name="max_articles_entries">
-        <item>5</item>
         <item>10</item>
         <item>20</item>
+        <item>50</item>
     </string-array>
     <string-array name="max_articles_values">
-        <item>five</item>
         <item>ten</item>
         <item>twenty</item>
+        <item>fifty</item>
     </string-array>
 
     <!-- Search Radius Preferences -->
