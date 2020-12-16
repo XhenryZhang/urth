@@ -17,7 +17,14 @@
         android:id="@+id/drawer_news_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="20dp"
+        android:layout_marginBottom="20dp"
         android:text="@string/get_news_articles" />
+
+    <Button
+        android:id="@+id/drawer_bookmark_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/add_to_bookmarks" />
 
 </LinearLayout>

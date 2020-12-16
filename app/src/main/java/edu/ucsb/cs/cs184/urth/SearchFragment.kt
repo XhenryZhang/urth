@@ -76,6 +76,12 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
 
+    // click location
+    private var city: String? = ""
+    private var state: String? = ""
+    private var country: String? = ""
+    private lateinit var clickLatLng: LatLng
+
     // only gets called once the view is created
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,49 +136,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         mMapView.getMapAsync(OnMapReadyCallback { mMap ->
             googleMap = mMap
 
-            // request and wait for location permissions to be granted
-//            if (ActivityCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_FINE_LOCATION
-//                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_COARSE_LOCATION
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                ActivityCompat.requestPermissions(
-//                    requireActivity(),
-//                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
-//                )
-//
-//                // pause app until permissions are added
-//                while (true) {
-//                    if (!(ActivityCompat.checkSelfPermission(
-//                            requireContext(),
-//                            Manifest.permission.ACCESS_FINE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                            requireContext(),
-//                            Manifest.permission.ACCESS_COARSE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED
-//                                )
-//                    ) {
-//                        break
-//                    }
-//                }
-//            }
-
-//            googleMap.isMyLocationEnabled = true
-
-            val locationManager =
-                requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-
-            // center map on current location
-//            startLatLng = if (location != null) {
-//                LatLng(location.latitude, location.longitude)
-//            } else {
-//                LatLng(-34.0, 151.0)
-//            }
-
             mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
 
             // initialize variables
@@ -188,32 +151,40 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 marker?.remove()
                 marker = mMap.addMarker(MarkerOptions().position(it))
 
+                city = ""
+                state = ""
+                country = ""
+
                 citySet = HashSet()
                 countySet = HashSet()
                 stateSet = HashSet()
                 countrySet = HashSet()
+
+                viewModelNews.setNews(Array<NewsObject?>(0){_ -> null})
+
+                clickLatLng = LatLng(it.latitude, it.longitude)
 
                 try {
                     val geocoder = Geocoder(requireContext(), Locale.getDefault())
                     val locations = geocoder.getFromLocation(it.latitude, it.longitude, 1)
 
                     if (locations != null && locations.size > 0) {
-                        val city = locations[0].locality
+                        city = locations[0].locality
                         val county = locations[0].subAdminArea
-                        val state = locations[0].adminArea
-                        val country = locations[0].countryName
+                        state = locations[0].adminArea
+                        country = locations[0].countryName
 
                         if (city != null) {
-                            citySet.add(city)
+                            citySet.add(city!!)
                         }
                         if (county != null) {
                             countySet.add(county)
                         }
                         if (state != null) {
-                            stateSet.add(state)
+                            stateSet.add(state!!)
                         }
                         if (country != null) {
-                            countrySet.add(country)
+                            countrySet.add(country!!)
                         }
                     }
                 } catch (e: IOException) {
@@ -515,7 +486,18 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
-    override fun getLocation(): String {
-        return location.toString()
+    // implements method for getting the current city, state, and country from BottomNavigationDrawer
+    override fun getLocation(): ArrayList<String> {
+        var locationsArray = ArrayList<String>()
+        if (!city.isNullOrBlank()) locationsArray.add(city!!)
+        if (!state.isNullOrBlank()) locationsArray.add(state!!)
+        if (!country.isNullOrBlank()) locationsArray.add(country!!)
+
+        return locationsArray
+    }
+
+    // implements method for getting latitude and longitude of click from BottomNavigationDrawer
+    override fun getLatLng(): LatLng {
+        return clickLatLng
     }
 }

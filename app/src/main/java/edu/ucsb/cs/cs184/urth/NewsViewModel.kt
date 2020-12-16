@@ -13,6 +13,10 @@ class NewsViewModel : ViewModel() {
         value = Array<NewsObject?>(0) {_ -> null}
     }
 
+    fun getNews(): Array<NewsObject?>?{
+        return _news.value
+    }
+
     fun changeTextVal(newVal: String) {
         _textString.value = newVal
     }

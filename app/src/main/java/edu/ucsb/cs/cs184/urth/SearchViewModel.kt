@@ -7,7 +7,7 @@ import com.google.android.gms.maps.model.LatLng
 
 class SearchViewModel: ViewModel() {
     private val _mapLocation = MutableLiveData<LatLng>(). apply {
-        value = LatLng(-34.0, 151.0)
+        value = LatLng(34.4208, -119.6982)
     }
 
     fun setLocation(newLoc: LatLng) {
