@@ -1,6 +1,7 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.util.Log
+import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DatabaseReference
 
 object FirebaseUtil {
@@ -14,5 +15,11 @@ object FirebaseUtil {
             .addOnFailureListener {
                 Log.e(TAG, "Error saving preferences to Firebase: ${it.message}")
             }
+    }
+
+    fun addBookmark(ref: DatabaseReference, location: LatLng, locationString: String){
+        val newRef = ref.child(locationString)
+        newRef.child("latitude").setValue(location.latitude)
+        newRef.child("longitude").setValue(location.longitude)
     }
 }
