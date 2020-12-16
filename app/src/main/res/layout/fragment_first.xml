@@ -7,15 +7,72 @@
     tools:context=".SearchFragment">
 
     <com.google.android.gms.maps.MapView
-        xmlns:map="http://schemas.android.com/apk/res-auto"
         android:id="@+id/mapView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:cameraZoom="8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        map:cameraZoom="8"
-        map:uiZoomControls="true"/>
+        app:layout_constraintVertical_bias="1.0"
+        app:uiZoomControls="true" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/news_open_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/purple_200"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@android:drawable/ic_input_add" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/entertainment_news_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="false"
+        android:focusable="true"
+        android:src="@android:drawable/star_big_off"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/general_news_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/technology_news_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="false"
+        android:focusable="true"
+        android:src="@drawable/fui_ic_apple_white_24dp"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/entertainment_news_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/general_news_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:clickable="false"
+        android:focusable="true"
+        android:src="@drawable/fui_ic_check_circle_black_128dp"
+        android:visibility="invisible"
+        app:backgroundTint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="@+id/mapView"
+        app:layout_constraintTop_toBottomOf="@+id/news_open_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
