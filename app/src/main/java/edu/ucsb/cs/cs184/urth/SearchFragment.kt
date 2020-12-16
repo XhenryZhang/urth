@@ -363,7 +363,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             }
             val q = if (userPrefs.searchArticleBody) "q" else "qInTitle"
             val pageSize = userPrefs.maxArticles.pageSize
-            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=84f2017538e54767a2557129ec44f823"
+            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=74d85486ba4647208725db551df58782"
         }else  {
             url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }

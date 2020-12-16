@@ -70,9 +70,9 @@ class NewsFragment : Fragment() {
 
                 override fun onFinish() {
                     if (viewModel.getNews()?.isEmpty() == true){
-                        val oopsMsg = requireActivity().findViewById<TextView>(R.id.oopsTextView)
-                        val emptyMsg = requireActivity().findViewById<TextView>(R.id.noNewsTextView)
-                        val progress = requireActivity().findViewById<ProgressBar>(R.id.progressBar)
+                        val oopsMsg = view.findViewById<TextView>(R.id.oopsTextView)
+                        val emptyMsg = view.findViewById<TextView>(R.id.noNewsTextView)
+                        val progress = view.findViewById<ProgressBar>(R.id.progressBar)
                         progress.visibility = View.INVISIBLE
                         oopsMsg.visibility = View.VISIBLE
                         emptyMsg.visibility = View.VISIBLE
