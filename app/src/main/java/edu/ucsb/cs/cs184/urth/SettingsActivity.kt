@@ -3,6 +3,7 @@ package edu.ucsb.cs.cs184.urth
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+//import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseAuth
@@ -42,6 +43,16 @@ class SettingsActivity : AppCompatActivity() {
             setFirebasePrefs(ref, userPrefs)
         }
     }
+
+    // This would make the settings activity return to whatever fragment was showing before (e.g.
+    // the news list, but we would still need to update the list to reflect any settings changes).
+//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+//        if (item.itemId == android.R.id.home) {
+//            finish()
+//            return true
+//        }
+//        return super.onOptionsItemSelected(item)
+//    }
 
     private fun listenForPreferenceChanges() {
         sp.registerOnSharedPreferenceChangeListener { sharedPreferences, key ->

@@ -1,6 +1,8 @@
 package edu.ucsb.cs.cs184.urth
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import com.android.volley.Request
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
@@ -68,6 +71,10 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var location: HashSet<String>
     private lateinit var date: String
     private lateinit var searchType: String
+
+    // preferences
+    private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
+    private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
 
     // only gets called once the view is created
     override fun onCreateView(
@@ -216,7 +223,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 // request nearby cities
                 val queue = Volley.newRequestQueue(requireContext())
                 var url = "http://gd.geobytes.com/GetNearbyCities?"
-                val radius = 20
+                val radius = userPrefs.searchRadius.km
 
                 url += "radius=$radius&Latitude=${it.latitude}&Longitude=${it.longitude}"
 
@@ -236,8 +243,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                         // define headers and make request
                         locationSet = (citySet + countySet) as HashSet<String>
                         location = locationSet
-                        date = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
-                        searchType = "relevance"
+                        date = getDateFromPreferences()
+                        searchType = userPrefs.defaultSort.sortMethod
 
                         bottomDrawerFragment.show(childFragmentManager, "TRANSITION_NEWS")
                     },
@@ -254,6 +261,19 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     override fun onStop() {
         super.onStop()
         viewModelSearch.setLocation(googleMap.cameraPosition.target)
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun getDateFromPreferences(): String {
+        val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        when (userPrefs.recencyFilter) {
+            RecencyFilter.PAST_DAY, RecencyFilter.PAST_WEEK ->
+                cal.add(Calendar.DATE, -userPrefs.recencyFilter.duration)
+            RecencyFilter.PAST_MONTH -> cal.add(Calendar.MONTH, -userPrefs.recencyFilter.duration)
+        }
+        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+            .apply { timeZone = TimeZone.getTimeZone("UTC") }
+            .format(cal.time)
     }
 
     // setup code for the floating action buttons accessing today's top articles
@@ -370,7 +390,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                     queries += "\"${location}\""
                 }
             }
-            url = "http://newsapi.org/v2/everything?qInTitle=${queries}&from=${date}&sortBy=${queryType}&language=en&apiKey=84f2017538e54767a2557129ec44f823"
+            val q = if (userPrefs.searchArticleBody) "q" else "qInTitle"
+            val pageSize = userPrefs.maxArticles.pageSize
+            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=84f2017538e54767a2557129ec44f823"
         }else  {
             url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }
@@ -431,7 +453,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
         queue.add(stringRequest)
     }
-
 
     // gets the top headlines in the US, for user given category
     private fun performTop10Query(category: Int) {
@@ -497,6 +518,4 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     override fun getLocation(): String {
         return location.toString()
     }
-
 }
-

@@ -30,9 +30,6 @@
     <string name="recency_filter_title">Show articles from</string>
     <string name="max_articles_title">Maximum articles shown</string>
     <string name="search_radius_title">Limit search radius around tap</string>
-    <string name="expand_search_title">Auto-expand search radius</string>
-    <string name="expand_search_summary_off">Only search for articles within the specified radius</string>
-    <string name="expand_search_summary_on">Expand search radius if no nearby articles are found</string>
     <string name="search_article_body_title">Search article body</string>
     <string name="search_article_body_summary_off">Search for locations in article titles only</string>
     <string name="search_article_body_summary_on">Search for locations in article bodies</string>
