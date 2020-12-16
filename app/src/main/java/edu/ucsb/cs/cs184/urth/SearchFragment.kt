@@ -1,8 +1,6 @@
 package edu.ucsb.cs.cs184.urth
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
 import android.os.Bundle
@@ -10,8 +8,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -24,6 +23,7 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.json.JSONArray
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -36,8 +36,28 @@ import kotlin.collections.HashSet
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
 class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
+    // view models
     private lateinit var viewModelNews: NewsViewModel
     private lateinit var viewModelSearch: SearchViewModel
+
+    // animation for floating action buttons
+    private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.rotate_button_1) }
+    private val rotateClose: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.unrotate_button_1) }
+    private val fromTop1: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.from_top_level_1) }
+    private val toTop1: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.to_top_level_1) }
+
+    private val fromTop2: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.from_top_level_2) }
+    private val toTop2: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.to_top_level_2) }
+    private val fromTop3: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.from_top_level_3) }
+    private val toTop3: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.to_top_level_3) }
+
+    // floating action buttons
+    private lateinit var button_open: FloatingActionButton
+    private lateinit var button_general: FloatingActionButton
+    private lateinit var button_entertainment: FloatingActionButton
+    private lateinit var button_technology: FloatingActionButton
+
+    private var clicked = false // flag for whether the FAB drawer is toggled on or off
 
     // map objects
     lateinit var mMapView: MapView
@@ -54,6 +74,19 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // sets animation end behavior
+        toTop1.setAnimationListener(object: Animation.AnimationListener {
+            override fun onAnimationEnd(animation: Animation?) {
+                clearAnim()
+            }
+
+            override fun onAnimationRepeat(animation: Animation?) {
+            }
+
+            override fun onAnimationStart(animation: Animation?) {
+            }
+        })
+
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_first, container, false)
     }
@@ -62,7 +95,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     // genre of news -- currently defaults to 2 days ago
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // this is our drawer fragment
+
+        // bottom drawer fragment
         val bottomDrawerFragment = BottomDrawerFragment()
 
         viewModelNews = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
@@ -81,6 +115,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         viewModelSearch.mapLocation.observe(viewLifecycleOwner, {
             startLatLng = it
         })
+
+        // implement button functionality
+        buttonSetup(view)
 
         // implement map functionality
         mMapView.getMapAsync(OnMapReadyCallback { mMap ->
@@ -219,6 +256,82 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         viewModelSearch.setLocation(googleMap.cameraPosition.target)
     }
 
+    // setup code for the floating action buttons accessing today's top articles
+    private fun buttonSetup(view: View) {
+        clicked = false
+        button_open = view.findViewById(R.id.news_open_button)
+        button_technology = view.findViewById(R.id.technology_news_button)
+        button_entertainment = view.findViewById(R.id.entertainment_news_button)
+        button_general = view.findViewById(R.id.general_news_button)
+
+        // opens the drawer containing 3 floating action buttons for displaying
+        // news from different categories
+        button_open.setOnClickListener {
+            setAnimation()
+            setVisibility()
+            setClickable()
+            clicked = !clicked
+        }
+
+        button_general.setOnClickListener {
+            performTop10Query(0)
+        }
+        button_technology.setOnClickListener {
+            performTop10Query(1)
+        }
+        button_entertainment.setOnClickListener {
+            performTop10Query(2)
+        }
+    }
+
+    // toggle FAB visibility
+    private fun setVisibility() {
+        if (!clicked) {
+            button_technology.visibility = View.VISIBLE
+            button_entertainment.visibility = View.VISIBLE
+            button_general.visibility = View.VISIBLE
+        }else {
+            button_technology.visibility = View.GONE
+            button_entertainment.visibility = View.GONE
+            button_general.visibility = View.GONE
+        }
+    }
+
+    // open and close animation
+    private fun setAnimation() {
+        if (!clicked) {
+            button_open.startAnimation(rotateOpen)
+            button_technology.startAnimation(fromTop3)
+            button_general.startAnimation(fromTop1)
+            button_entertainment.startAnimation(fromTop2)
+        } else {
+            button_open.startAnimation(rotateClose)
+            button_technology.startAnimation(toTop3)
+            button_general.startAnimation(toTop1)
+            button_entertainment.startAnimation(toTop2)
+        }
+    }
+
+    // buttons can only be clicked when they're visible
+    private fun setClickable() {
+        if (!clicked) {
+            button_technology.isClickable = true
+            button_general.isClickable = true
+            button_entertainment.isClickable = true
+        } else {
+            button_technology.isClickable = false
+            button_general.isClickable = false
+            button_entertainment.isClickable = false
+        }
+    }
+
+    // clears animations associated with each button
+    private fun clearAnim() {
+        button_technology.clearAnimation()
+        button_general.clearAnimation()
+        button_entertainment.clearAnimation()
+    }
+
     // creates a list of news objects and passes it to the NewsViewModel
     private fun createNewsObject(
         titleStore: ArrayList<String>,
@@ -243,21 +356,25 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     }
 
     // makes the query with the news API
-    private fun makeQuery(locations: ArrayList<String>, date: String, queryType: String) {
-        val queue = Volley.newRequestQueue(activity)
+    private fun makeQuery(locations: ArrayList<String>, date: String, queryType: String, top10Category: String) {
+        val queue = Volley.newRequestQueue(activity) // HTTP request queue
+        var url: String = "placeholder" // stores request url
 
-        // generates query string
-        var queries: String = ""
-        for (location in locations) {
-            if (location != locations[locations.size - 1]) {
-                queries += "\"${location}\" OR "
-            }else {
-                queries += "\"${location}\""
+        if (top10Category == "") {
+            // generates query string
+            var queries: String = ""
+            for (location in locations) {
+                if (location != locations[locations.size - 1]) {
+                    queries += "\"${location}\" OR "
+                }else {
+                    queries += "\"${location}\""
+                }
             }
+            url = "http://newsapi.org/v2/everything?qInTitle=${queries}&from=${date}&sortBy=${queryType}&language=en&apiKey=84f2017538e54767a2557129ec44f823"
+        }else  {
+            url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }
 
-        // TODO: replace api key with your own
-        var url = "http://newsapi.org/v2/everything?qInTitle=${queries}&from=${date}&sortBy=${queryType}&apiKey=84f2017538e54767a2557129ec44f823"
         val titleStore = ArrayList<String>() // displays title of article
         val linkStore = ArrayList<String>() // will be used to direct the user to the browser when they click on news cardview
         val imageLinkStore = ArrayList<String>() // will be used to display image in teh cardview
@@ -266,7 +383,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
         Log.d("request", url)
 
-        // creates an anonymous object of JsonObjectRequest, and overrides it getHeader method
+        // creates an anonymous object of JsonObjectRequest, and overrides its getHeader method
         val stringRequest:JsonObjectRequest = object: JsonObjectRequest(Request.Method.GET,
             url,
             null,
@@ -304,7 +421,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 Log.d("ERROR", error.toString())
             }
         ) {
-            // need to add addition things to the header, or request will be met with 403 error for an known reason
+            // need to add additional things to the header, or request will be met with 403 error for an known reason
             override fun getHeaders(): MutableMap<String, String> {
                 val headers = HashMap<String, String>()
                 headers["User-Agent"] = "Mozilla/5.0"
@@ -313,6 +430,25 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         }
 
         queue.add(stringRequest)
+    }
+
+
+    // gets the top headlines in the US, for user given category
+    private fun performTop10Query(category: Int) {
+        // general news
+        if (category == 0) {
+            // general
+            makeQuery(object: ArrayList<String>(0) {}, "", "", "general")
+        }else if (category == 1) {
+            // tech
+            makeQuery(object: ArrayList<String>(0) {}, "", "", "technology")
+        }else {
+            // entertainment
+            makeQuery(object: ArrayList<String>(0) {}, "", "", "entertainment")
+        }
+
+        // switch to news fragment
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
     override fun onResume() {
@@ -350,11 +486,17 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         }
     }
 
+    // implements the method inherited from the interface from BottomNavigationDrawer
     override fun performNewsQuery() {
-        makeQuery(ArrayList<String>(location), date, searchType)
+        makeQuery(ArrayList<String>(location), date, searchType, "")
 
         // switch to NewsFragment
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
+    override fun getLocation(): String {
+        return location.toString()
+    }
+
 }
+
