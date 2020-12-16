@@ -66,6 +66,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     lateinit var mMapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var startLatLng: LatLng
+    private lateinit var markers: ArrayList<Marker>
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -226,6 +227,19 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 stringRequest.tag = "requestTag"
                 queue.add(stringRequest)
             }
+
+            markers = ArrayList()
+            viewModelSearch.bmLocation.observe(viewLifecycleOwner, { locations ->
+                for (oldMarker in markers) {
+                    oldMarker.remove()
+                }
+                markers.clear()
+                for (location in locations) {
+                    val latlng = LatLng(location.latitude, location.longitude)
+                    val newMarker = mMap.addMarker(MarkerOptions().position(latlng))
+                    markers.add(newMarker)
+                }
+            })
         })
     }
 
