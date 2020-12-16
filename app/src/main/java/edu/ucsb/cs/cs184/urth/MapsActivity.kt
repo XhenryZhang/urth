@@ -23,7 +23,7 @@ class MapsActivity : AppCompatActivity() {
 
     private lateinit var sp: SharedPreferences
     private lateinit var uid: String
-    private lateinit var ref: DatabaseReference
+    private lateinit var prefRef: DatabaseReference
     private lateinit var userPrefs: UserPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,11 +34,11 @@ class MapsActivity : AppCompatActivity() {
         sp = PreferenceManager.getDefaultSharedPreferences(this)
         uid = FirebaseAuth.getInstance().uid!!
         Log.d("debugging", uid)
-        ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
+        prefRef = FirebaseDatabase.getInstance().getReference("/users/$uid/preferences")
         if (intent.getBooleanExtra(AuthActivity.EXTRA_FETCH_PERMISSIONS, false)) {
             // Try to retrieve user preferences from Firebase
             Log.d(TAG, "Fetching user preferences for user $uid from database...")
-            getFirebasePrefs(ref)
+            getFirebasePrefs(prefRef)
         } else {
             // Retrieve user preferences from the local preference manager
             userPrefs = sp.fetchLocalPreferences()
