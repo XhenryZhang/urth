@@ -92,6 +92,7 @@ class BottomDrawerFragment : BottomSheetDialogFragment() {
 
                 Toast.makeText(context, "Added to bookmarks!", Toast.LENGTH_SHORT).show()
                 FirebaseUtil.addBookmark(bmRef, locationString, location)
+                dismiss()
             } else {
                 Toast.makeText(context, "Unable to add location", Toast.LENGTH_SHORT).show()
             }
