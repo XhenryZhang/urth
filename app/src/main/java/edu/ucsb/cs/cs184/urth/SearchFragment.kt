@@ -21,6 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -248,7 +249,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 markers.clear()
                 for (location in locations) {
                     val latlng = LatLng(location.latitude, location.longitude)
-                    val newMarker = mMap.addMarker(MarkerOptions().position(latlng))
+                    val newMarker = mMap.addMarker(MarkerOptions()
+                        .position(latlng)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)))
                     newMarker.tag = BottomDrawerFragment.BOOKMARK
                     markers.add(newMarker)
                 }

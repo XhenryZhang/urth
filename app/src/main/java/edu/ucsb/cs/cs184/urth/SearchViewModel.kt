@@ -40,7 +40,13 @@ class SearchViewModel : ViewModel() {
                 _bmLocations.value = _bmLocations.value
             }
 
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                val location = snapshot.getValue(Location::class.java)
+                _bmLocations.value?.remove(location!!)
+                _bmLocations.value?.add(location!!)
+                _bmLocations.value = _bmLocations.value
+            }
+
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
             override fun onCancelled(error: DatabaseError) {}
         })
