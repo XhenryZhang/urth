@@ -16,7 +16,7 @@ object FirebaseUtil {
             }
     }
 
-    fun addBookmark(ref: DatabaseReference, locationString: String, location: Location){
+    fun addBookmark(ref: DatabaseReference, locationString: String, location: Location) {
         val newRef = ref.child(locationString)
         newRef.setValue(location)
             .addOnSuccessListener {
@@ -24,6 +24,17 @@ object FirebaseUtil {
             }
             .addOnFailureListener {
                 Log.e(TAG, "Error saving bookmark to Firebase: ${it.message}")
+            }
+    }
+
+    fun removeBookmark(ref: DatabaseReference, locationString: String) {
+        val bmRef = ref.child(locationString)
+        bmRef.removeValue()
+            .addOnSuccessListener {
+                Log.d(TAG, "Removed bookmark from Firebase")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error removing bookmark from Firebase: ${it.message}")
             }
     }
 }
