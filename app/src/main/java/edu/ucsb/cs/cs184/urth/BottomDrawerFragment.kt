@@ -1,6 +1,5 @@
 package edu.ucsb.cs.cs184.urth
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,11 +10,22 @@ import android.widget.Toast
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 
-class BottomDrawerFragment: BottomSheetDialogFragment() {
+class BottomDrawerFragment : BottomSheetDialogFragment() {
     var activityCallback: NavigationListener? = null
     var locationString: String = ""
+
+    private val uid: String by lazy { FirebaseAuth.getInstance().uid!! }
+    private val bmRef: DatabaseReference by lazy {
+        FirebaseDatabase.getInstance().getReference("/users/$uid/bookmarks")
+    }
+
+    companion object {
+        const val BOOKMARK = "BOOKMARK"
+        const val NEW_MARKER = "NEW_MARKER"
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,28 +59,47 @@ class BottomDrawerFragment: BottomSheetDialogFragment() {
         locationString = ""
         val locationList = activityCallback?.getLocation()
         if (locationList != null) {
-            if (locationList.isNotEmpty()){
+            if (locationList.isNotEmpty()) {
                 locationString = locationList[0]
             }
             var i = 1
-            while (i <= locationList.lastIndex){
+            while (i <= locationList.lastIndex) {
                 locationString += ", ${locationList[i++]}"
             }
         }
         textView.text = locationString
 
         // button for bookmarks
-        val bookMarkButton: Button = view.findViewById(R.id.drawer_bookmark_button)
+        val bookmarkButton: Button = view.findViewById(R.id.drawer_bookmark_button)
+        val unbookmarkButton: Button = view.findViewById(R.id.drawer_unbookmark_button)
 
-        bookMarkButton.setOnClickListener {
+        if (tag == BOOKMARK) {
+            unbookmarkButton.visibility = View.VISIBLE
+        } else {
+            bookmarkButton.visibility = View.VISIBLE
+        }
+
+        bookmarkButton.setOnClickListener {
             if (locationString.isNotBlank()) {
+                while (locationList!!.size < 3) locationList.add(0, "")
+                val city = if (locationList[0].isNotEmpty()) locationList[0] else null
+                val state = if (locationList[1].isNotEmpty()) locationList[1] else null
+                val country = locationList[2]
+                val latlng = activityCallback!!.getLatLng()
+                val latitude = latlng.latitude
+                val longitude = latlng.longitude
+                val location = Location(city, state, country, latitude, longitude)
+
                 Toast.makeText(context, "Added to bookmarks!", Toast.LENGTH_SHORT).show()
-                val uid = FirebaseAuth.getInstance().uid
-                val ref = FirebaseDatabase.getInstance().getReference("/users/$uid/bookmarks")
-                FirebaseUtil.addBookmark(ref, activityCallback!!.getLatLng(), locationString)
+                FirebaseUtil.addBookmark(bmRef, locationString, location)
             } else {
                 Toast.makeText(context, "Unable to add location", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        unbookmarkButton.setOnClickListener {
+            FirebaseUtil.removeBookmark(bmRef, locationString)
+            dismiss()
         }
     }
 }

@@ -1,10 +1,8 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.location.Geocoder
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -66,6 +64,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     lateinit var mMapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var startLatLng: LatLng
+    private lateinit var markers: ArrayList<Marker>
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -217,7 +216,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                         date = getDateFromPreferences()
                         searchType = userPrefs.defaultSort.sortMethod
 
-                        bottomDrawerFragment.show(childFragmentManager, "TRANSITION_NEWS")
+                        bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
                     },
                     { error ->
                         Log.d("ERROR", error.toString())
@@ -226,6 +225,34 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 stringRequest.tag = "requestTag"
                 queue.add(stringRequest)
             }
+
+            mMap.setOnMarkerClickListener {
+                val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                val locations = geocoder.getFromLocation(it.position.latitude, it.position.longitude, 1)
+                if (locations != null && locations.size > 0) {
+                    city = locations[0].locality
+                    state = locations[0].adminArea
+                    country = locations[0].countryName
+                }
+
+                val fragmentTag = if (it.tag != null) BottomDrawerFragment.BOOKMARK else BottomDrawerFragment.NEW_MARKER
+                bottomDrawerFragment.show(childFragmentManager, fragmentTag)
+                true
+            }
+
+            markers = ArrayList()
+            viewModelSearch.bmLocation.observe(viewLifecycleOwner, { locations ->
+                for (oldMarker in markers) {
+                    oldMarker.remove()
+                }
+                markers.clear()
+                for (location in locations) {
+                    val latlng = LatLng(location.latitude, location.longitude)
+                    val newMarker = mMap.addMarker(MarkerOptions().position(latlng))
+                    newMarker.tag = BottomDrawerFragment.BOOKMARK
+                    markers.add(newMarker)
+                }
+            })
         })
     }
 

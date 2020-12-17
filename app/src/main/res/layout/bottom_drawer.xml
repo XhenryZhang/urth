@@ -2,16 +2,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center_horizontal">
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
     <TextView
-        android:layout_margin="20dp"
         android:id="@+id/drawer_text"
-        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="TESTING THE FRAGMENT" />
+        android:layout_margin="20dp"
+        android:gravity="center" />
 
     <Button
         android:id="@+id/drawer_news_button"
@@ -25,6 +24,15 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="20dp"
-        android:text="@string/add_to_bookmarks" />
+        android:text="@string/add_to_bookmarks"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/drawer_unbookmark_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:text="@string/remove_from_bookmarks"
+        android:visibility="gone" />
 
 </LinearLayout>

@@ -1,7 +1,6 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.util.Log
-import com.google.android.gms.maps.model.LatLng
 import com.google.firebase.database.DatabaseReference
 
 object FirebaseUtil {
@@ -17,9 +16,25 @@ object FirebaseUtil {
             }
     }
 
-    fun addBookmark(ref: DatabaseReference, location: LatLng, locationString: String){
+    fun addBookmark(ref: DatabaseReference, locationString: String, location: Location) {
         val newRef = ref.child(locationString)
-        newRef.child("latitude").setValue(location.latitude)
-        newRef.child("longitude").setValue(location.longitude)
+        newRef.setValue(location)
+            .addOnSuccessListener {
+                Log.d(TAG, "Saved bookmark to Firebase")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error saving bookmark to Firebase: ${it.message}")
+            }
+    }
+
+    fun removeBookmark(ref: DatabaseReference, locationString: String) {
+        val bmRef = ref.child(locationString)
+        bmRef.removeValue()
+            .addOnSuccessListener {
+                Log.d(TAG, "Removed bookmark from Firebase")
+            }
+            .addOnFailureListener {
+                Log.e(TAG, "Error removing bookmark from Firebase: ${it.message}")
+            }
     }
 }
