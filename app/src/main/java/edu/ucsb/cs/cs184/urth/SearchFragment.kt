@@ -82,6 +82,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private var country: String? = ""
     private lateinit var clickLatLng: LatLng
 
+    var locationSet: HashSet<String> = HashSet()
+
     // only gets called once the view is created
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -140,11 +142,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
             // initialize variables
             var marker: Marker? = null
-            var citySet: HashSet<String>
-            var countySet: HashSet<String>
-            var stateSet: HashSet<String>
-            var countrySet: HashSet<String>
-            var locationSet: HashSet<String>
 
             // handle map clicks -- saves location of cities and opens drawer
             mMap.setOnMapClickListener {
@@ -155,86 +152,18 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 state = ""
                 country = ""
 
-                citySet = HashSet()
-                countySet = HashSet()
-                stateSet = HashSet()
-                countrySet = HashSet()
 
                 viewModelNews.setNews(Array<NewsObject?>(0){_ -> null})
 
                 clickLatLng = LatLng(it.latitude, it.longitude)
 
-                try {
-                    val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                    val locations = geocoder.getFromLocation(it.latitude, it.longitude, 1)
+                getNearbyLocations(it.latitude, it.longitude)
 
-                    if (locations != null && locations.size > 0) {
-                        city = locations[0].locality
-                        val county = locations[0].subAdminArea
-                        state = locations[0].adminArea
-                        country = locations[0].countryName
-
-                        if (city != null) {
-                            citySet.add(city!!)
-                        }
-                        if (county != null) {
-                            countySet.add(county)
-                        }
-                        if (state != null) {
-                            stateSet.add(state!!)
-                        }
-                        if (country != null) {
-                            countrySet.add(country!!)
-                        }
-                    }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-
-                // request nearby cities
-                val queue = Volley.newRequestQueue(requireContext())
-                var url = "http://gd.geobytes.com/GetNearbyCities?"
-                val radius = userPrefs.searchRadius.km
-
-                url += "radius=$radius&Latitude=${it.latitude}&Longitude=${it.longitude}"
-
-                val stringRequest = StringRequest(Request.Method.GET, url,
-                    { response ->
-                        val responseArray = JSONArray(response)
-
-                        // add returned cities to citySet
-                        for (i in 0 until responseArray.length()) {
-                            if (responseArray.getJSONArray(i).length() >= 1) {
-                                if (responseArray.getJSONArray(i).getString(1) != null) {
-                                    citySet.add(responseArray.getJSONArray(i).getString(1))
-                                }
-                            }
-                        }
-
-                        // define headers and make request
-                        locationSet = (citySet + countySet) as HashSet<String>
-                        location = locationSet
-                        date = getDateFromPreferences()
-                        searchType = userPrefs.defaultSort.sortMethod
-
-                        bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
-                    },
-                    { error ->
-                        Log.d("ERROR", error.toString())
-                    })
-
-                stringRequest.tag = "requestTag"
-                queue.add(stringRequest)
+                bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
             }
 
             mMap.setOnMarkerClickListener {
-                val geocoder = Geocoder(requireContext(), Locale.getDefault())
-                val locations = geocoder.getFromLocation(it.position.latitude, it.position.longitude, 1)
-                if (locations != null && locations.size > 0) {
-                    city = locations[0].locality
-                    state = locations[0].adminArea
-                    country = locations[0].countryName
-                }
+                getNearbyLocations(it.position.latitude, it.position.longitude)
 
                 val fragmentTag = if (it.tag != null) BottomDrawerFragment.BOOKMARK else BottomDrawerFragment.NEW_MARKER
                 bottomDrawerFragment.show(childFragmentManager, fragmentTag)
@@ -257,6 +186,62 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 }
             })
         })
+    }
+
+    private fun getNearbyLocations(lat: Double, lon: Double){
+        try {
+            val geocoder = Geocoder(requireContext(), Locale.getDefault())
+            val locations = geocoder.getFromLocation(lat, lon, 1)
+
+            if (locations != null && locations.size > 0) {
+                city = locations[0].locality
+                val county = locations[0].subAdminArea
+                state = locations[0].adminArea
+                country = locations[0].countryName
+
+                if (city != null) {
+                    locationSet.add(city!!)
+                }
+                if (county != null) {
+                    locationSet.add(county)
+                }
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        // request nearby cities
+        val queue = Volley.newRequestQueue(requireContext())
+        var url = "http://gd.geobytes.com/GetNearbyCities?"
+        val radius = userPrefs.searchRadius.km
+
+        url += "radius=$radius&Latitude=${lat}&Longitude=${lon}"
+
+        val stringRequest = StringRequest(Request.Method.GET, url,
+            { response ->
+                val responseArray = JSONArray(response)
+
+                // add returned cities to citySet
+                for (i in 0 until responseArray.length()) {
+                    if (responseArray.getJSONArray(i).length() >= 1) {
+                        if (responseArray.getJSONArray(i).getString(1) != null) {
+                            locationSet.add(responseArray.getJSONArray(i).getString(1))
+                        }
+                    }
+                }
+
+                // define headers and make request
+                location = locationSet
+                date = getDateFromPreferences()
+                searchType = userPrefs.defaultSort.sortMethod
+
+            },
+            { error ->
+                Log.d("ERROR", error.toString())
+            })
+
+        stringRequest.tag = "requestTag"
+        queue.add(stringRequest)
     }
 
     override fun onStop() {
