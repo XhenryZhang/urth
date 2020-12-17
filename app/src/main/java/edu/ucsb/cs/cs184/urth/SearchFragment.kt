@@ -58,6 +58,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var button_general: FloatingActionButton
     private lateinit var button_entertainment: FloatingActionButton
     private lateinit var button_technology: FloatingActionButton
+    private lateinit var button_bookmarks: FloatingActionButton
 
     private var clicked = false // flag for whether the FAB drawer is toggled on or off
 
@@ -71,6 +72,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var location: HashSet<String>
     private lateinit var date: String
     private lateinit var searchType: String
+    private lateinit var bmLocation: HashSet<String>
 
     // preferences
     private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
@@ -188,7 +190,13 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         })
     }
 
-    private fun getNearbyLocations(lat: Double, lon: Double){
+    private fun getNearbyLocations(
+        lat: Double,
+        lon: Double,
+        cb: ((HashSet<String>, Boolean) -> Unit)? = null,
+        flag: Boolean = false
+    ) {
+        val locSet = HashSet<String>()
         try {
             val geocoder = Geocoder(requireContext(), Locale.getDefault())
             val locations = geocoder.getFromLocation(lat, lon, 1)
@@ -200,10 +208,10 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 country = locations[0].countryName
 
                 if (city != null) {
-                    locationSet.add(city!!)
+                    locSet.add(city!!)
                 }
                 if (county != null) {
-                    locationSet.add(county)
+                    locSet.add(county)
                 }
             }
         } catch (e: IOException) {
@@ -225,16 +233,20 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 for (i in 0 until responseArray.length()) {
                     if (responseArray.getJSONArray(i).length() >= 1) {
                         if (responseArray.getJSONArray(i).getString(1) != null) {
-                            locationSet.add(responseArray.getJSONArray(i).getString(1))
+                            locSet.add(responseArray.getJSONArray(i).getString(1))
                         }
                     }
                 }
 
                 // define headers and make request
-                location = locationSet
                 date = getDateFromPreferences()
                 searchType = userPrefs.defaultSort.sortMethod
-
+                if (cb != null) {
+                    cb(locSet, flag)
+                } else {
+                    locationSet = locSet
+                    location = locationSet
+                }
             },
             { error ->
                 Log.d("ERROR", error.toString())
@@ -269,6 +281,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         button_technology = view.findViewById(R.id.technology_news_button)
         button_entertainment = view.findViewById(R.id.entertainment_news_button)
         button_general = view.findViewById(R.id.general_news_button)
+        button_bookmarks = view.findViewById(R.id.bookmark_news_button)
 
         // opens the drawer containing 3 floating action buttons for displaying
         // news from different categories
@@ -287,6 +300,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         }
         button_entertainment.setOnClickListener {
             performTop10Query(2)
+        }
+        button_bookmarks.setOnClickListener {
+            getBookmarkArticles()
         }
     }
 
@@ -378,7 +394,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             }
             val q = if (userPrefs.searchArticleBody) "q" else "qInTitle"
             val pageSize = userPrefs.maxArticles.pageSize
-            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=74d85486ba4647208725db551df58782"
+            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=fd89a7c8fd914e2fb8144c15790cacbb"
         }else  {
             url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }
@@ -456,6 +472,38 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
         // switch to news fragment
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
+
+    // gets news articles for bookmarked locations
+    private fun getBookmarkArticles() {
+        if (this::bmLocation.isInitialized) {
+            bmLocation.clear()
+        } else {
+            bmLocation = HashSet()
+        }
+
+        val bmLoc = viewModelSearch.bmLocation.value!!
+        if (bmLoc.isEmpty()) {
+            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+        }
+        for (loc in bmLoc) {
+            val flag = bmLoc.isNotEmpty() && loc == bmLoc.last()
+            getNearbyLocations(loc.latitude, loc.longitude, ::addNearbyLocations, flag)
+        }
+    }
+
+    // add locations that are near a bookmarked location
+    private fun addNearbyLocations(nearbyLocations: HashSet<String>, shouldTransition: Boolean) {
+        bmLocation.addAll(nearbyLocations)
+        if (shouldTransition) {
+            val bmLocationList = ArrayList(bmLocation)
+            if (bmLocationList.isEmpty()) {
+                Toast.makeText(context, "No cities bookmarked!", Toast.LENGTH_SHORT).show()
+            } else {
+                makeQuery(bmLocationList, date, searchType, "")
+                findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+            }
+        }
     }
 
     override fun onResume() {

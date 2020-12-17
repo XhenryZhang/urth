@@ -30,8 +30,7 @@
         android:src="@android:drawable/ic_input_add"
         app:backgroundTint="@color/purple_200"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@android:drawable/ic_input_add" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/entertainment_news_button"
@@ -74,5 +73,18 @@
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="@+id/mapView"
         app:layout_constraintTop_toBottomOf="@+id/news_open_button" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/bookmark_news_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ic_baseline_bookmark_24"
+        app:backgroundTint="@color/purple_200"
+        app:layout_constraintStart_toEndOf="@+id/news_open_button"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
