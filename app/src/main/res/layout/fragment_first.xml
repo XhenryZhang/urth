@@ -13,10 +13,10 @@
         app:cameraZoom="8"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
+        app:layout_constraintVertical_bias="0.0"
         app:uiZoomControls="true" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -42,7 +42,7 @@
         android:focusable="true"
         android:src="@android:drawable/star_big_off"
         android:visibility="invisible"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/purple_200"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/general_news_button" />
 
@@ -56,7 +56,7 @@
         android:focusable="true"
         android:src="@drawable/fui_ic_apple_white_24dp"
         android:visibility="invisible"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/purple_200"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entertainment_news_button" />
 
@@ -70,7 +70,7 @@
         android:focusable="true"
         android:src="@drawable/fui_ic_check_circle_black_128dp"
         android:visibility="invisible"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="@color/purple_200"
         app:layout_constraintStart_toStartOf="@+id/mapView"
         app:layout_constraintTop_toBottomOf="@+id/news_open_button" />
 
@@ -86,5 +86,38 @@
         app:backgroundTint="@color/purple_200"
         app:layout_constraintStart_toEndOf="@+id/news_open_button"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_general"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/general_news"
+        app:layout_constraintStart_toEndOf="@+id/general_news_button"
+        app:layout_constraintTop_toBottomOf="@+id/bookmark_news_button" />
+
+    <TextView
+        android:id="@+id/text_technology"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="42dp"
+        android:visibility="invisible"
+        android:text="@string/technology"
+        app:layout_constraintStart_toEndOf="@+id/technology_news_button"
+        app:layout_constraintTop_toBottomOf="@+id/text_entertainment" />
+
+    <TextView
+        android:id="@+id/text_entertainment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="48dp"
+        android:visibility="invisible"
+        android:text="@string/entertainment"
+        app:layout_constraintStart_toEndOf="@+id/entertainment_news_button"
+        app:layout_constraintTop_toBottomOf="@+id/text_general" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

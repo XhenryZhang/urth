@@ -11,9 +11,11 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 
 class SearchViewModel : ViewModel() {
+    // where the view of the map is centered
     private val _mapLocation = MutableLiveData<LatLng>().apply {
         value = LatLng(34.4208, -119.6982)
     }
+
     private val _bmLocations = MutableLiveData<HashSet<Location>>()
     val bmLocation = _bmLocations
 
@@ -27,6 +29,8 @@ class SearchViewModel : ViewModel() {
         _bmLocations.value = HashSet()
         val uid = FirebaseAuth.getInstance().uid!!
         val bmRef = FirebaseDatabase.getInstance().getReference("/users/$uid/bookmarks")
+
+        // updates the MutableLiveData to mirror changes in location data in Firebase
         bmRef.addChildEventListener(object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val location = snapshot.getValue(Location::class.java)

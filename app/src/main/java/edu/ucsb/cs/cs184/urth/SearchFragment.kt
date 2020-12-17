@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -41,6 +42,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     // view models
     private lateinit var viewModelNews: NewsViewModel
     private lateinit var viewModelSearch: SearchViewModel
+    private lateinit var bottomDrawerFragment: BottomDrawerFragment
 
     // animation for floating action buttons
     private val rotateOpen: Animation by lazy { AnimationUtils.loadAnimation(this.context, R.anim.rotate_button_1) }
@@ -59,6 +61,11 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var button_entertainment: FloatingActionButton
     private lateinit var button_technology: FloatingActionButton
     private lateinit var button_bookmarks: FloatingActionButton
+
+    // UI FAB text
+    private lateinit var text_general: TextView
+    private lateinit var text_entertainment: TextView
+    private lateinit var text_technology: TextView
 
     private var clicked = false // flag for whether the FAB drawer is toggled on or off
 
@@ -91,17 +98,17 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // sets animation end behavior
+        // sets animation end behavior  -- whenever one animation ends, clear all the other animations on the screen
+        // this is to prevent animations from becoming visible upon the view losing focus when the bottom drawer is opened
+        // or when the appbar menu is selected
         toTop1.setAnimationListener(object: Animation.AnimationListener {
             override fun onAnimationEnd(animation: Animation?) {
                 clearAnim()
             }
 
-            override fun onAnimationRepeat(animation: Animation?) {
-            }
+            override fun onAnimationRepeat(animation: Animation?) {}
 
-            override fun onAnimationStart(animation: Animation?) {
-            }
+            override fun onAnimationStart(animation: Animation?) {}
         })
 
         // Inflate the layout for this fragment
@@ -114,7 +121,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         super.onViewCreated(view, savedInstanceState)
 
         // bottom drawer fragment
-        val bottomDrawerFragment = BottomDrawerFragment()
+        bottomDrawerFragment = BottomDrawerFragment()
 
         viewModelNews = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
         viewModelSearch = ViewModelProvider(activity as ViewModelStoreOwner).get(SearchViewModel::class.java)
@@ -154,11 +161,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 state = ""
                 country = ""
 
-
                 viewModelNews.setNews(Array<NewsObject?>(0){_ -> null})
-
                 clickLatLng = LatLng(it.latitude, it.longitude)
-
                 getNearbyLocations(it.latitude, it.longitude)
 
                 bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
@@ -167,12 +171,15 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             mMap.setOnMarkerClickListener {
                 getNearbyLocations(it.position.latitude, it.position.longitude)
 
+                // option to remove or add the bookmark
                 val fragmentTag = if (it.tag != null) BottomDrawerFragment.BOOKMARK else BottomDrawerFragment.NEW_MARKER
                 bottomDrawerFragment.show(childFragmentManager, fragmentTag)
                 true
             }
 
             markers = ArrayList()
+
+            // refresh the bookmark array once database is updated
             viewModelSearch.bmLocation.observe(viewLifecycleOwner, { locations ->
                 for (oldMarker in markers) {
                     oldMarker.remove()
@@ -258,6 +265,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
     override fun onStop() {
         super.onStop()
+        // when the view changes, remember the current camera location
         viewModelSearch.setLocation(googleMap.cameraPosition.target)
     }
 
@@ -282,6 +290,10 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         button_entertainment = view.findViewById(R.id.entertainment_news_button)
         button_general = view.findViewById(R.id.general_news_button)
         button_bookmarks = view.findViewById(R.id.bookmark_news_button)
+
+        text_general = view.findViewById(R.id.text_general)
+        text_technology = view.findViewById(R.id.text_technology)
+        text_entertainment = view.findViewById(R.id.text_entertainment)
 
         // opens the drawer containing 3 floating action buttons for displaying
         // news from different categories
@@ -312,10 +324,16 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             button_technology.visibility = View.VISIBLE
             button_entertainment.visibility = View.VISIBLE
             button_general.visibility = View.VISIBLE
+            text_technology.visibility = View.VISIBLE
+            text_entertainment.visibility = View.VISIBLE
+            text_general.visibility = View.VISIBLE
         }else {
             button_technology.visibility = View.GONE
             button_entertainment.visibility = View.GONE
             button_general.visibility = View.GONE
+            text_technology.visibility = View.GONE
+            text_entertainment.visibility = View.GONE
+            text_general.visibility = View.GONE
         }
     }
 
@@ -326,11 +344,17 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             button_technology.startAnimation(fromTop3)
             button_general.startAnimation(fromTop1)
             button_entertainment.startAnimation(fromTop2)
+            text_technology.startAnimation(fromTop3)
+            text_entertainment.startAnimation(fromTop2)
+            text_general.startAnimation(fromTop1)
         } else {
             button_open.startAnimation(rotateClose)
             button_technology.startAnimation(toTop3)
             button_general.startAnimation(toTop1)
             button_entertainment.startAnimation(toTop2)
+            text_technology.startAnimation(toTop3)
+            text_entertainment.startAnimation(toTop2)
+            text_general.startAnimation(toTop1)
         }
     }
 
@@ -352,6 +376,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         button_technology.clearAnimation()
         button_general.clearAnimation()
         button_entertainment.clearAnimation()
+        text_technology.clearAnimation()
+        text_entertainment.clearAnimation()
+        text_general.clearAnimation()
     }
 
     // creates a list of news objects and passes it to the NewsViewModel

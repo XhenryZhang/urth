@@ -38,5 +38,8 @@
     <string name="remove_from_bookmarks">Remove from Bookmarks</string>
     <string name="no_news">We couldn\'t find any news associated with that location.</string>
     <string name="oops">Oops!</string>
+    <string name="general_news">General News</string>
+    <string name="technology">Technology</string>
+    <string name="entertainment">Entertainment</string>
 
 </resources>
