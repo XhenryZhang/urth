@@ -1,10 +1,8 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.SharedPreferences
 import android.location.Geocoder
-import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +21,7 @@ import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
@@ -66,6 +65,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     lateinit var mMapView: MapView
     private lateinit var googleMap: GoogleMap
     private lateinit var startLatLng: LatLng
+    private lateinit var markers: ArrayList<Marker>
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -75,6 +75,12 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     // preferences
     private val sp: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(context) }
     private val userPrefs: UserPreferences by lazy { sp.fetchLocalPreferences() }
+
+    // click location
+    private var city: String? = ""
+    private var state: String? = ""
+    private var country: String? = ""
+    private lateinit var clickLatLng: LatLng
 
     // only gets called once the view is created
     override fun onCreateView(
@@ -130,49 +136,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         mMapView.getMapAsync(OnMapReadyCallback { mMap ->
             googleMap = mMap
 
-            // request and wait for location permissions to be granted
-//            if (ActivityCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_FINE_LOCATION
-//                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                    requireContext(),
-//                    Manifest.permission.ACCESS_COARSE_LOCATION
-//                ) != PackageManager.PERMISSION_GRANTED
-//            ) {
-//                ActivityCompat.requestPermissions(
-//                    requireActivity(),
-//                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 100
-//                )
-//
-//                // pause app until permissions are added
-//                while (true) {
-//                    if (!(ActivityCompat.checkSelfPermission(
-//                            requireContext(),
-//                            Manifest.permission.ACCESS_FINE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-//                            requireContext(),
-//                            Manifest.permission.ACCESS_COARSE_LOCATION
-//                        ) != PackageManager.PERMISSION_GRANTED
-//                                )
-//                    ) {
-//                        break
-//                    }
-//                }
-//            }
-
-//            googleMap.isMyLocationEnabled = true
-
-            val locationManager =
-                requireActivity().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//            var location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-
-            // center map on current location
-//            startLatLng = if (location != null) {
-//                LatLng(location.latitude, location.longitude)
-//            } else {
-//                LatLng(-34.0, 151.0)
-//            }
-
             mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
 
             // initialize variables
@@ -188,32 +151,40 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 marker?.remove()
                 marker = mMap.addMarker(MarkerOptions().position(it))
 
+                city = ""
+                state = ""
+                country = ""
+
                 citySet = HashSet()
                 countySet = HashSet()
                 stateSet = HashSet()
                 countrySet = HashSet()
+
+                viewModelNews.setNews(Array<NewsObject?>(0){_ -> null})
+
+                clickLatLng = LatLng(it.latitude, it.longitude)
 
                 try {
                     val geocoder = Geocoder(requireContext(), Locale.getDefault())
                     val locations = geocoder.getFromLocation(it.latitude, it.longitude, 1)
 
                     if (locations != null && locations.size > 0) {
-                        val city = locations[0].locality
+                        city = locations[0].locality
                         val county = locations[0].subAdminArea
-                        val state = locations[0].adminArea
-                        val country = locations[0].countryName
+                        state = locations[0].adminArea
+                        country = locations[0].countryName
 
                         if (city != null) {
-                            citySet.add(city)
+                            citySet.add(city!!)
                         }
                         if (county != null) {
                             countySet.add(county)
                         }
                         if (state != null) {
-                            stateSet.add(state)
+                            stateSet.add(state!!)
                         }
                         if (country != null) {
-                            countrySet.add(country)
+                            countrySet.add(country!!)
                         }
                     }
                 } catch (e: IOException) {
@@ -246,7 +217,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                         date = getDateFromPreferences()
                         searchType = userPrefs.defaultSort.sortMethod
 
-                        bottomDrawerFragment.show(childFragmentManager, "TRANSITION_NEWS")
+                        bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
                     },
                     { error ->
                         Log.d("ERROR", error.toString())
@@ -255,6 +226,36 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 stringRequest.tag = "requestTag"
                 queue.add(stringRequest)
             }
+
+            mMap.setOnMarkerClickListener {
+                val geocoder = Geocoder(requireContext(), Locale.getDefault())
+                val locations = geocoder.getFromLocation(it.position.latitude, it.position.longitude, 1)
+                if (locations != null && locations.size > 0) {
+                    city = locations[0].locality
+                    state = locations[0].adminArea
+                    country = locations[0].countryName
+                }
+
+                val fragmentTag = if (it.tag != null) BottomDrawerFragment.BOOKMARK else BottomDrawerFragment.NEW_MARKER
+                bottomDrawerFragment.show(childFragmentManager, fragmentTag)
+                true
+            }
+
+            markers = ArrayList()
+            viewModelSearch.bmLocation.observe(viewLifecycleOwner, { locations ->
+                for (oldMarker in markers) {
+                    oldMarker.remove()
+                }
+                markers.clear()
+                for (location in locations) {
+                    val latlng = LatLng(location.latitude, location.longitude)
+                    val newMarker = mMap.addMarker(MarkerOptions()
+                        .position(latlng)
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)))
+                    newMarker.tag = BottomDrawerFragment.BOOKMARK
+                    markers.add(newMarker)
+                }
+            })
         })
     }
 
@@ -392,7 +393,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             }
             val q = if (userPrefs.searchArticleBody) "q" else "qInTitle"
             val pageSize = userPrefs.maxArticles.pageSize
-            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=84f2017538e54767a2557129ec44f823"
+            url = "http://newsapi.org/v2/everything?${q}=${queries}&from=${date}&sortBy=${queryType}&language=en&pageSize=${pageSize}&apiKey=74d85486ba4647208725db551df58782"
         }else  {
             url = "http://newsapi.org/v2/top-headlines?country=us&category=${top10Category}&apiKey=c1196b87101143c49414efbeaa14ab2b"
         }
@@ -515,7 +516,18 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
-    override fun getLocation(): String {
-        return location.toString()
+    // implements method for getting the current city, state, and country from BottomNavigationDrawer
+    override fun getLocation(): ArrayList<String> {
+        var locationsArray = ArrayList<String>()
+        if (!city.isNullOrBlank()) locationsArray.add(city!!)
+        if (!state.isNullOrBlank()) locationsArray.add(state!!)
+        if (!country.isNullOrBlank()) locationsArray.add(country!!)
+
+        return locationsArray
+    }
+
+    // implements method for getting latitude and longitude of click from BottomNavigationDrawer
+    override fun getLatLng(): LatLng {
+        return clickLatLng
     }
 }

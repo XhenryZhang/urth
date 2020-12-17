@@ -1,10 +1,13 @@
 package edu.ucsb.cs.cs184.urth
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -54,6 +57,29 @@ class NewsFragment : Fragment() {
                 imageURLs.add(newsInfo!!.imageUrl)
                 newsURLs.add(newsInfo!!.url)
             }
+
+            // hide loading spinner if articles returned
+            if (it.isNotEmpty()){
+                val progress = requireActivity().findViewById<ProgressBar>(R.id.progressBar)
+                progress.visibility = View.INVISIBLE
+            }
+
+            // empty message display after 3 seconds if no news returned
+            val timer = object: CountDownTimer(3000, 1000){
+                override fun onTick(millisUntilFinished: Long) {}
+
+                override fun onFinish() {
+                    if (viewModel.getNews()?.isEmpty() == true){
+                        val oopsMsg = view.findViewById<TextView>(R.id.oopsTextView)
+                        val emptyMsg = view.findViewById<TextView>(R.id.noNewsTextView)
+                        val progress = view.findViewById<ProgressBar>(R.id.progressBar)
+                        progress.visibility = View.INVISIBLE
+                        oopsMsg.visibility = View.VISIBLE
+                        emptyMsg.visibility = View.VISIBLE
+                    }
+                }
+            }
+            timer.start()
 
             nra.setContent(headlines, dates, publishers, imageURLs, newsURLs) // adds info about each news article to our adapter
             adapter = nra

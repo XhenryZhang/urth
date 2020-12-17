@@ -34,4 +34,9 @@
     <string name="search_article_body_summary_off">Search for locations in article titles only</string>
     <string name="search_article_body_summary_on">Search for locations in article bodies</string>
 
+    <string name="add_to_bookmarks">Add to Bookmarks</string>
+    <string name="remove_from_bookmarks">Remove from Bookmarks</string>
+    <string name="no_news">We couldn\'t find any news associated with that location.</string>
+    <string name="oops">Oops!</string>
+
 </resources>

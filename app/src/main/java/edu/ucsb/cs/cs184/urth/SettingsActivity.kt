@@ -39,8 +39,8 @@ class SettingsActivity : AppCompatActivity() {
         super.onDestroy()
         if (settingsChanged) {
             val uid = FirebaseAuth.getInstance().uid
-            val ref = FirebaseDatabase.getInstance().getReference("/users/$uid")
-            setFirebasePrefs(ref, userPrefs)
+            val prefRef = FirebaseDatabase.getInstance().getReference("/users/$uid/preferences")
+            setFirebasePrefs(prefRef, userPrefs)
         }
     }
 
