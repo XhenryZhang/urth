@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +9,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import edu.ucsb.cs.cs184.urth.model.Location
 
 class SearchViewModel : ViewModel() {
     // where the view of the map is centered

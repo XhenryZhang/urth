@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="edu.ucsb.cs.cs184.urth.SearchFragment"
+        android:name="edu.ucsb.cs.cs184.urth.fragment.SearchFragment"
         android:label="@string/first_fragment_label"
         tools:layout="@layout/fragment_first">
 
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/SecondFragment"
-        android:name="edu.ucsb.cs.cs184.urth.NewsFragment"
+        android:name="edu.ucsb.cs.cs184.urth.fragment.NewsFragment"
         android:label="@string/second_fragment_label"
         tools:layout="@layout/fragment_second">
 

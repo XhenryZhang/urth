@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.fragment
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -27,6 +27,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import edu.ucsb.cs.cs184.urth.R
+import edu.ucsb.cs.cs184.urth.model.NewsObject
+import edu.ucsb.cs.cs184.urth.model.RecencyFilter
+import edu.ucsb.cs.cs184.urth.model.UserPreferences
+import edu.ucsb.cs.cs184.urth.util.fetchLocalPreferences
+import edu.ucsb.cs.cs184.urth.viewmodel.NewsViewModel
+import edu.ucsb.cs.cs184.urth.viewmodel.SearchViewModel
 import org.json.JSONArray
 import java.io.IOException
 import java.text.SimpleDateFormat

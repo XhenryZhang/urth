@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.model
 
 data class UserPreferences(
     var defaultSort: DefaultSort,

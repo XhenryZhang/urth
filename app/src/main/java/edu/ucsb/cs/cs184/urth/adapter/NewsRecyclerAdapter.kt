@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.adapter
 
 import android.content.Intent
 import android.net.Uri
@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import edu.ucsb.cs.cs184.urth.R
 
 class NewsRecyclerAdapter : RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
 

@@ -1,7 +1,9 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.util
 
 import android.util.Log
 import com.google.firebase.database.DatabaseReference
+import edu.ucsb.cs.cs184.urth.model.Location
+import edu.ucsb.cs.cs184.urth.model.UserPreferences
 
 object FirebaseUtil {
     private val TAG = FirebaseUtil::class.simpleName
