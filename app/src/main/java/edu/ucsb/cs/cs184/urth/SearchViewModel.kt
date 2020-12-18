@@ -19,6 +19,12 @@ class SearchViewModel : ViewModel() {
     private val _bmLocations = MutableLiveData<HashSet<Location>>()
     val bmLocation = _bmLocations
 
+    private val _newMarkerPos = MutableLiveData<LatLng?>()
+    val newMarkerPos = _newMarkerPos
+
+    private val _markerPos = MutableLiveData<LatLng?>()
+    val markerPos = _markerPos
+
     fun setLocation(newLoc: LatLng) {
         _mapLocation.value = newLoc
     }
@@ -27,6 +33,8 @@ class SearchViewModel : ViewModel() {
 
     init {
         _bmLocations.value = HashSet()
+        _newMarkerPos.value = null
+        _markerPos.value = null
         val uid = FirebaseAuth.getInstance().uid!!
         val bmRef = FirebaseDatabase.getInstance().getReference("/users/$uid/bookmarks")
 
