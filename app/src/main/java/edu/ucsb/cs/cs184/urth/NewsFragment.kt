@@ -11,7 +11,6 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.navigation.fragment.findNavController
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,8 +24,8 @@ class NewsFragment : Fragment() {
     private var adapter: RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>? = null
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_second, container, false)
@@ -37,12 +36,13 @@ class NewsFragment : Fragment() {
         val newsRecyclerView: RecyclerView = view.findViewById(R.id.newsRecyclerView)
 
         // view model to store data from the API
-        viewModel = ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
+        viewModel =
+            ViewModelProvider(activity as ViewModelStoreOwner).get(NewsViewModel::class.java)
 
         viewModel.news.observe(viewLifecycleOwner, Observer {
             layoutManager = LinearLayoutManager(context)
             newsRecyclerView.layoutManager = layoutManager
-            val nra: NewsRecyclerAdapter = NewsRecyclerAdapter()
+            val nra = NewsRecyclerAdapter()
 
             val headlines: ArrayList<String> = arrayListOf()
             val dates: ArrayList<String> = arrayListOf()
@@ -59,17 +59,17 @@ class NewsFragment : Fragment() {
             }
 
             // hide loading spinner if articles returned
-            if (it.isNotEmpty()){
+            if (it.isNotEmpty()) {
                 val progress = requireActivity().findViewById<ProgressBar>(R.id.progressBar)
                 progress.visibility = View.INVISIBLE
             }
 
             // empty message display after 3 seconds if no news returned
-            val timer = object: CountDownTimer(3000, 1000){
+            val timer = object : CountDownTimer(3000, 1000) {
                 override fun onTick(millisUntilFinished: Long) {}
 
                 override fun onFinish() {
-                    if (viewModel.getNews()?.isEmpty() == true){
+                    if (viewModel.getNews()?.isEmpty() == true) {
                         val oopsMsg = view.findViewById<TextView>(R.id.oopsTextView)
                         val emptyMsg = view.findViewById<TextView>(R.id.noNewsTextView)
                         val progress = view.findViewById<ProgressBar>(R.id.progressBar)
@@ -81,14 +81,15 @@ class NewsFragment : Fragment() {
             }
             timer.start()
 
-            nra.setContent(headlines, dates, publishers, imageURLs, newsURLs) // adds info about each news article to our adapter
+            nra.setContent(
+                headlines,
+                dates,
+                publishers,
+                imageURLs,
+                newsURLs
+            ) // adds info about each news article to our adapter
             adapter = nra
             newsRecyclerView.adapter = adapter
         })
-
-//        view.findViewById<Button>(R.id.button_second).setOnClickListener {
-//            findNavController().navigate(R.id.action_SecondFragment_to_FirstFragment)
-//        }
-
     }
 }
