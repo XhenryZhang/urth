@@ -90,6 +90,7 @@ class BottomDrawerFragment : BottomSheetDialogFragment() {
                 val longitude = latlng.longitude
                 val location = Location(city, state, country, latitude, longitude)
 
+                (parentFragment as SearchFragment).removeNewMarker()
                 Toast.makeText(context, "Added to bookmarks!", Toast.LENGTH_SHORT).show()
                 FirebaseUtil.addBookmark(bmRef, locationString, location)
                 dismiss()

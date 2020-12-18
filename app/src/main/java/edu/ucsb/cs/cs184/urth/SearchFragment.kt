@@ -94,6 +94,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var googleMap: GoogleMap
     private lateinit var startLatLng: LatLng
     private lateinit var markers: ArrayList<Marker>
+    private var marker: Marker? = null
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -169,9 +170,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
             googleMap = mMap
 
             mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
-
-            // initialize variables
-            var marker: Marker? = null
 
             // handle map clicks -- saves location of cities and opens drawer
             mMap.setOnMapClickListener {
@@ -624,4 +622,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     override fun getLatLng(): LatLng {
         return clickLatLng
     }
+
+    fun removeNewMarker() = marker?.remove()
 }
