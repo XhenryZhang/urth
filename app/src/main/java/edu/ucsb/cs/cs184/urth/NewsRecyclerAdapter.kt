@@ -8,53 +8,49 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivity
 
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 
-class NewsRecyclerAdapter: RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
+class NewsRecyclerAdapter : RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>() {
+
+    companion object {
+        private val TAG = NewsRecyclerAdapter::class.simpleName
+    }
+
     private var headlines: ArrayList<String> = arrayListOf()
     private var dates: ArrayList<String> = arrayListOf()
     private var publishers: ArrayList<String> = arrayListOf()
     private var imageURLs: ArrayList<String> = arrayListOf()
     private var newsURLs: ArrayList<String> = arrayListOf()
 
-    inner class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        var headlineView: TextView
-        var dateView: TextView
-        var publisherView: TextView
-        var newsImageView: ImageView
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var headlineView: TextView = itemView.findViewById(R.id.item_title)
+        var dateView: TextView = itemView.findViewById(R.id.item_date)
+        var publisherView: TextView = itemView.findViewById(R.id.item_publisher)
+        var newsImageView: ImageView = itemView.findViewById(R.id.item_image)
 
         init {
-            headlineView = itemView.findViewById(R.id.item_title)
-            dateView = itemView.findViewById(R.id.item_date)
-            publisherView = itemView.findViewById(R.id.item_publisher)
-            newsImageView = itemView.findViewById(R.id.item_image)
-
             itemView.setOnClickListener {
-                var position = adapterPosition
-                val browser: Intent = Intent(Intent.ACTION_VIEW, Uri.parse(newsURLs[position]))
+                val position = adapterPosition
+                val browser = Intent(Intent.ACTION_VIEW, Uri.parse(newsURLs[position]))
                 it.context.startActivity(browser)
-                Log.d("request", "attempt to open browser")
+                Log.d(TAG, "Attempting to open browser...")
             }
         }
     }
 
-    fun setContent(headlinesArr: ArrayList<String>, datesArr: ArrayList<String>,
-                   publisherArr: ArrayList<String>, imageUrlArr: ArrayList<String>,
-                   newsUrlArr: ArrayList<String>) {
+    fun setContent(
+        headlinesArr: ArrayList<String>, datesArr: ArrayList<String>,
+        publisherArr: ArrayList<String>, imageUrlArr: ArrayList<String>,
+        newsUrlArr: ArrayList<String>
+    ) {
         headlines = headlinesArr
         dates = datesArr
         publishers = publisherArr
         imageURLs = imageUrlArr
         newsURLs = newsUrlArr
-//        headlines.add(str)
-//        dates.add(str)
-//        publishers.add(str)
-//        imageURLs.add("https://s1.reutersmedia.net/resources_v2/images/rcom-default.png?w=800")
-//        newsURLs.add(str)
     }
 
     // creates a view holder via inflating our view
@@ -70,11 +66,11 @@ class NewsRecyclerAdapter: RecyclerView.Adapter<NewsRecyclerAdapter.ViewHolder>(
         viewHolder.dateView.text = dates[i]
         viewHolder.publisherView.text = publishers[i]
         Glide.with(viewHolder.itemView.context)
-                .load(imageURLs[i])
-                .centerCrop()
-                .skipMemoryCache(true)
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .into(viewHolder.newsImageView)
+            .load(imageURLs[i])
+            .centerCrop()
+            .skipMemoryCache(true)
+            .diskCacheStrategy(DiskCacheStrategy.NONE)
+            .into(viewHolder.newsImageView)
     }
 
     override fun getItemCount(): Int {
