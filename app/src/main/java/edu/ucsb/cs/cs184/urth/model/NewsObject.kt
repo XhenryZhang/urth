@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.model
 
 // each news object represents one news article.
 class NewsObject(

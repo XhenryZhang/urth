@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.fragment
 
 import android.os.Bundle
 import android.os.CountDownTimer
@@ -14,6 +14,9 @@ import androidx.lifecycle.ViewModelStoreOwner
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import edu.ucsb.cs.cs184.urth.adapter.NewsRecyclerAdapter
+import edu.ucsb.cs.cs184.urth.viewmodel.NewsViewModel
+import edu.ucsb.cs.cs184.urth.R
 
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
@@ -52,10 +55,10 @@ class NewsFragment : Fragment() {
 
             for (newsInfo in it) {
                 headlines.add(newsInfo!!.headline)
-                dates.add(newsInfo!!.datePublished)
-                publishers.add(newsInfo!!.publisher)
-                imageURLs.add(newsInfo!!.imageUrl)
-                newsURLs.add(newsInfo!!.url)
+                dates.add(newsInfo.datePublished)
+                publishers.add(newsInfo.publisher)
+                imageURLs.add(newsInfo.imageUrl)
+                newsURLs.add(newsInfo.url)
             }
 
             // hide loading spinner if articles returned

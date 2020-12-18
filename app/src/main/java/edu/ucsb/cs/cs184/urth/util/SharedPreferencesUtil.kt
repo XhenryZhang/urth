@@ -1,6 +1,8 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.util
 
 import android.content.SharedPreferences
+import edu.ucsb.cs.cs184.urth.*
+import edu.ucsb.cs.cs184.urth.model.*
 import java.util.Locale
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties

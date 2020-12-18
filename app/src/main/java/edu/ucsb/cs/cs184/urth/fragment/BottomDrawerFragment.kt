@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,6 +12,9 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import edu.ucsb.cs.cs184.urth.util.FirebaseUtil
+import edu.ucsb.cs.cs184.urth.model.Location
+import edu.ucsb.cs.cs184.urth.R
 
 class BottomDrawerFragment : BottomSheetDialogFragment() {
     var activityCallback: NavigationListener? = null

@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.fragment
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -27,6 +27,13 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
+import edu.ucsb.cs.cs184.urth.R
+import edu.ucsb.cs.cs184.urth.model.NewsObject
+import edu.ucsb.cs.cs184.urth.model.RecencyFilter
+import edu.ucsb.cs.cs184.urth.model.UserPreferences
+import edu.ucsb.cs.cs184.urth.util.fetchLocalPreferences
+import edu.ucsb.cs.cs184.urth.viewmodel.NewsViewModel
+import edu.ucsb.cs.cs184.urth.viewmodel.SearchViewModel
 import org.json.JSONArray
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -94,7 +101,8 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private lateinit var googleMap: GoogleMap
     private lateinit var startLatLng: LatLng
     private lateinit var markers: ArrayList<Marker>
-    private var marker: Marker? = null
+    private var newMarker: Marker? = null // marker corresponding to the user's most recent new tap
+    private var marker: Marker? = null // marker corresponding to the user's most recent tap
 
     // arguments passed to the API query
     private lateinit var location: HashSet<String>
@@ -112,7 +120,6 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
     private var city: String? = ""
     private var state: String? = ""
     private var country: String? = ""
-    private lateinit var clickLatLng: LatLng
 
     var locationSet: HashSet<String> = HashSet()
 
@@ -171,23 +178,31 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
             mMap.moveCamera(CameraUpdateFactory.newLatLng(startLatLng))
 
+            // check for existing new marker (e.g. after screen rotation)
+            viewModelSearch.newMarkerPos.value?.let {
+                newMarker = mMap.addMarker(MarkerOptions().position(it))
+                if (it == viewModelSearch.markerPos.value) {
+                    viewModelNews.setNews(Array(0) { null })
+                    getNearbyLocations(it.latitude, it.longitude)
+                }
+            }
+
             // handle map clicks -- saves location of cities and opens drawer
             mMap.setOnMapClickListener {
-                marker?.remove()
-                marker = mMap.addMarker(MarkerOptions().position(it))
-
-                city = ""
-                state = ""
-                country = ""
+                newMarker?.remove()
+                newMarker = mMap.addMarker(MarkerOptions().position(it))
+                viewModelSearch.newMarkerPos.value = it
+                viewModelSearch.markerPos.value = it
 
                 viewModelNews.setNews(Array(0) { null })
-                clickLatLng = LatLng(it.latitude, it.longitude)
                 getNearbyLocations(it.latitude, it.longitude)
-
-                bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
+                if (!bottomDrawerFragment.isAdded) {
+                    bottomDrawerFragment.show(childFragmentManager, BottomDrawerFragment.NEW_MARKER)
+                }
             }
 
             mMap.setOnMarkerClickListener {
+                viewModelSearch.markerPos.value = it.position
                 getNearbyLocations(it.position.latitude, it.position.longitude)
 
                 // option to remove or add the bookmark
@@ -196,7 +211,9 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                 } else {
                     BottomDrawerFragment.NEW_MARKER
                 }
-                bottomDrawerFragment.show(childFragmentManager, fragmentTag)
+                if (!bottomDrawerFragment.isAdded) {
+                    bottomDrawerFragment.show(childFragmentManager, fragmentTag)
+                }
                 true
             }
 
@@ -217,6 +234,12 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
                     )
                     newMarker.tag = BottomDrawerFragment.BOOKMARK
                     markers.add(newMarker)
+
+                    // most recently clicked marker
+                    if (latlng == viewModelSearch.markerPos.value) {
+                        marker = newMarker
+                        getNearbyLocations(latlng.latitude, latlng.longitude)
+                    }
                 }
             })
         }
@@ -224,14 +247,14 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
     private fun getNearbyLocations(
         lat: Double,
-        lon: Double,
+        lng: Double,
         cb: ((HashSet<String>, Boolean) -> Unit)? = null,
         flag: Boolean = false
     ) {
         val locSet = HashSet<String>()
         try {
             val geocoder = Geocoder(requireContext(), Locale.getDefault())
-            val locations = geocoder.getFromLocation(lat, lon, 1)
+            val locations = geocoder.getFromLocation(lat, lng, 1)
 
             if (locations != null && locations.size > 0) {
                 city = locations[0].locality
@@ -255,7 +278,7 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
         var url = "http://gd.geobytes.com/GetNearbyCities?"
         val radius = userPrefs.searchRadius.km
 
-        url += "radius=$radius&Latitude=${lat}&Longitude=${lon}"
+        url += "radius=$radius&Latitude=${lat}&Longitude=${lng}"
 
         val stringRequest = StringRequest(Request.Method.GET, url,
             { response ->
@@ -602,6 +625,12 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
     // implements the method inherited from the interface from BottomNavigationDrawer
     override fun performNewsQuery() {
+        // not sure if this check is needed here
+        if (!this::location.isInitialized) {
+            viewModelSearch.markerPos.value?.let {
+                getNearbyLocations(it.latitude, it.longitude)
+            }
+        }
         makeQuery(ArrayList(location), date, searchType, "")
 
         // switch to NewsFragment
@@ -610,6 +639,12 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
     // implements method for getting the current city, state, and country from BottomNavigationDrawer
     override fun getLocation(): ArrayList<String> {
+        // this might happen if the user rotates the screen when the bottom drawer is open
+        if (!this::location.isInitialized) {
+            viewModelSearch.markerPos.value?.let {
+                getNearbyLocations(it.latitude, it.longitude)
+            }
+        }
         val locationsArray = ArrayList<String>()
         if (!city.isNullOrBlank()) locationsArray.add(city!!)
         if (!state.isNullOrBlank()) locationsArray.add(state!!)
@@ -620,8 +655,11 @@ class SearchFragment : Fragment(), BottomDrawerFragment.NavigationListener {
 
     // implements method for getting latitude and longitude of click from BottomNavigationDrawer
     override fun getLatLng(): LatLng {
-        return clickLatLng
+        return viewModelSearch.newMarkerPos.value!!
     }
 
-    fun removeNewMarker() = marker?.remove()
+    fun removeNewMarker() {
+        newMarker?.remove()
+        viewModelSearch.newMarkerPos.value = null
+    }
 }

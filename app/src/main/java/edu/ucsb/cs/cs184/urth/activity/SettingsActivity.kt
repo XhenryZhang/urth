@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.activity
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -7,7 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import edu.ucsb.cs.cs184.urth.FirebaseUtil.setFirebasePrefs
+import edu.ucsb.cs.cs184.urth.*
+import edu.ucsb.cs.cs184.urth.util.FirebaseUtil.setFirebasePrefs
+import edu.ucsb.cs.cs184.urth.fragment.SettingsFragment
+import edu.ucsb.cs.cs184.urth.model.UserPreferences
+import edu.ucsb.cs.cs184.urth.util.fetchLocalPreferences
+import edu.ucsb.cs.cs184.urth.util.getValue
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.memberProperties
 

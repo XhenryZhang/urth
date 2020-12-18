@@ -1,4 +1,4 @@
-package edu.ucsb.cs.cs184.urth
+package edu.ucsb.cs.cs184.urth.viewmodel
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,6 +9,7 @@ import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import edu.ucsb.cs.cs184.urth.model.Location
 
 class SearchViewModel : ViewModel() {
     // where the view of the map is centered
@@ -19,6 +20,12 @@ class SearchViewModel : ViewModel() {
     private val _bmLocations = MutableLiveData<HashSet<Location>>()
     val bmLocation = _bmLocations
 
+    private val _newMarkerPos = MutableLiveData<LatLng?>()
+    val newMarkerPos = _newMarkerPos
+
+    private val _markerPos = MutableLiveData<LatLng?>()
+    val markerPos = _markerPos
+
     fun setLocation(newLoc: LatLng) {
         _mapLocation.value = newLoc
     }
@@ -27,6 +34,8 @@ class SearchViewModel : ViewModel() {
 
     init {
         _bmLocations.value = HashSet()
+        _newMarkerPos.value = null
+        _markerPos.value = null
         val uid = FirebaseAuth.getInstance().uid!!
         val bmRef = FirebaseDatabase.getInstance().getReference("/users/$uid/bookmarks")
 
